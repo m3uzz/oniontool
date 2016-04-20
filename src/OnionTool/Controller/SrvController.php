@@ -50,8 +50,6 @@ use OnionSrv\System;
 use OnionLib\String;
 use OnionLib\Util;
 
-include_once ("ToolAbstract.php");
-
 class SrvController extends ToolAbstract
 {
 	
@@ -59,8 +57,7 @@ class SrvController extends ToolAbstract
 	 */
 	public function init ()
 	{
-		$this->_sConfigPath = CONFIG_DIR;
-		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'model' . DS . 'srv';
+		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'srv';
 	}
 
 
@@ -83,7 +80,7 @@ class SrvController extends ToolAbstract
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
 		
-		System::createDir($lsPathClient);
+		$this->createDir($lsPathClient);
 		
 		if (file_exists($lsPathClient))
 		{
@@ -92,19 +89,42 @@ class SrvController extends ToolAbstract
 			$this->saveFile($lsPathClient, 'onionsrv', $lsFileLicense);
 			
 			$lsPathConfig = $lsPathClient . DS . 'config';			
-			System::createDir($lsPathConfig);
+			$this->createDir($lsPathConfig);
 			$this->saveFile($lsPathConfig, 'srv-config', $lsFileLicense);
 			$this->saveFile($lsPathConfig, 'srv-module', $lsFileLicense);
 			$this->saveFile($lsPathConfig, 'srv-service', $lsFileLicense);
 			$this->saveFile($lsPathConfig, 'srv-validate', $lsFileLicense);
 			
+			$lsPathData = $lsPathClient . DS . 'data';
+			$this->createDir($lsPathData, 0777);
+			$lsPathDataLogs = $lsPathData . DS . 'logs';
+			$this->createDir($lsPathDataLogs, 0777);
+			
+			$lsPathLayout = $lsPathClient . DS . 'layout';
+			$this->createDir($lsPathLayout);
+			$lsPathLayoutTheme = $lsPathLayout . DS . 'theme';
+			$this->createDir($lsPathLayoutTheme);
+			$lsPathLayoutTemplate = $lsPathLayout . DS . 'template';
+			$this->createDir($lsPathLayoutTemplate);
+			
 			$lsPathPublic = $lsPathClient . DS . 'srv-public';			
-			System::createDir($lsPathPublic);
+			$this->createDir($lsPathPublic);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
 			$this->saveFile($lsPathPublic, 'htaccess', $lsFileLicense);
+			$this->saveFile($lsPathPublic, 'robots');
+			$this->saveFile($lsPathPublic, 'sitemap');
+			
+			$lsPathPublicCss = $lsPathPublic . DS . 'css';
+			$this->createDir($lsPathPublicCss);
+			$lsPathPublicFonts = $lsPathPublic . DS . 'fonts';
+			$this->createDir($lsPathPublicFonts);
+			$lsPathPublicImg = $lsPathPublic . DS . 'img';
+			$this->createDir($lsPathPublicImg);
+			$lsPathPublicJs = $lsPathPublic . DS . 'js';
+			$this->createDir($lsPathPublicJs);
 			
 			$lsPathService = $lsPathClient . DS . 'service';
-			System::createDir($lsPathService);
+			$this->createDir($lsPathService);
 		}
 		
 		if ($lsModule == null)
@@ -130,40 +150,43 @@ class SrvController extends ToolAbstract
 		if (file_exists($lsPathService))
 		{
 			$lsPathModule = $lsPathService . DS . $lsModule;
-			System::createDir($lsPathModule);
+			$this->createDir($lsPathModule);
 			
 			if (file_exists($lsPathModule))
 			{
 				$lsFileLicense = $this->getLicense($lsModule);
 				
 				$lsPathModuleConfig = $lsPathModule . DS . 'config';
-				System::createDir($lsPathModuleConfig);	
+				$this->createDir($lsPathModuleConfig);	
 				$this->saveFile($lsPathModuleConfig, 'help', $lsFileLicense, $lsModule);
-					
+
 				$lsPathSrc = $lsPathModule . DS . 'src';
-				System::createDir($lsPathSrc);
+				$this->createDir($lsPathSrc);
 										
 				if (file_exists($lsPathSrc))
 				{
 					$lsPathSrcModule = $lsPathSrc . DS . $lsModule;
-					System::createDir($lsPathSrcModule);
+					$this->createDir($lsPathSrcModule);
 
 					if (file_exists($lsPathSrcModule))
 					{
 						$lsPathController = $lsPathSrcModule . DS . 'Controller';
-						System::createDir($lsPathController);
+						$this->createDir($lsPathController);
 						$this->saveFile($lsPathController, 'Controller', $lsFileLicense, $lsModule);
 
 						$lsPathEntity = $lsPathSrcModule . DS . 'Entity';
-						System::createDir($lsPathEntity);
+						$this->createDir($lsPathEntity);
 						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense, $lsModule);
 						
 						$lsPathRepository = $lsPathSrcModule . DS . 'Repository';
-						System::createDir($lsPathRepository);
+						$this->createDir($lsPathRepository);
 						$this->saveFile($lsPathRepository, 'Repository', $lsFileLicense, $lsModule);
 						
 						$lsPathView = $lsPathSrcModule . DS . 'View';
-						System::createDir($lsPathView);
+						$this->createDir($lsPathView);
+						
+						$lsPathViewController = $lsPathView . DS . $lsModule;
+						$this->createDir($lsPathViewController);
 						
 						$this->setModuleAutoload($lsPathConfig, $lsModule, $lsClient);
 					}

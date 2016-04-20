@@ -50,7 +50,7 @@ defined('BASE_DIR') 	|| define('BASE_DIR', realpath(dirname(dirname(dirname(dirn
 defined('VENDOR_DIR') 	|| define('VENDOR_DIR', BASE_DIR . DS . 'vendor');
 defined('CLIENT_DIR') 	|| define('CLIENT_DIR', BASE_DIR . DS . 'client');
 defined('MODULE_DIR') 	|| define('MODULE_DIR', VENDOR_DIR . DS . 'm3uzz');
-defined('CONFIG_DIR') 	|| define('CONFIG_DIR', MODULE_DIR . DS . 'oniontool' . DS . 'src' . DS . 'OnionTool' . DS . 'config');
+defined('CONFIG_DIR') 	|| define('CONFIG_DIR', MODULE_DIR . DS . 'oniontool' . DS . 'config');
 
 $_SERVER['argv'][] = "--m=onionTool";
 $_SERVER['argv'][] = "--c=srv";

@@ -50,8 +50,6 @@ use OnionSrv\System;
 use OnionLib\String;
 use OnionLib\Util;
 
-include_once ("ToolAbstract.php");
-
 class CmsController extends ToolAbstract
 {
 	
@@ -59,8 +57,7 @@ class CmsController extends ToolAbstract
 	 */
 	public function init ()
 	{
-		$this->_sConfigPath = CONFIG_DIR;
-		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'model' . DS . 'cms';
+		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'cms';
 	}
 
 
@@ -127,9 +124,6 @@ class CmsController extends ToolAbstract
 			$lsPathLayoutTemplate = $lsPathLayout . DS . 'template';
 			$this->createDir($lsPathLayoutTemplate);
 				
-			$lsPathModule = $lsPathClient . DS . 'module';
-			$this->createDir($lsPathModule);
-				
 			$lsPathPublic = $lsPathClient . DS . 'public';
 			$this->createDir($lsPathPublic);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
@@ -145,6 +139,9 @@ class CmsController extends ToolAbstract
 			$this->createDir($lsPathPublicImg);
 			$lsPathPublicJs = $lsPathPublic . DS . 'js';
 			$this->createDir($lsPathPublicJs);
+			
+			$lsPathModule = $lsPathClient . DS . 'module';
+			$this->createDir($lsPathModule);
 		}
 		
 		if ($lsModule == null)
@@ -164,22 +161,31 @@ class CmsController extends ToolAbstract
 		$lsModule = ucfirst($lsModule);
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
-		$lsPathService = $lsPathClient . DS . 'service';
+		$lsPathModules = $lsPathClient . DS . 'module';
 		$lsPathConfig = $lsPathClient . DS . 'config';
 		
-		if (file_exists($lsPathService))
+		if (file_exists($lsPathModules))
 		{
-			$lsPathModule = $lsPathService . DS . $lsModule;
+			$lsPathModule = $lsPathModules . DS . $lsModule;
 			$this->createDir($lsPathModule);
 			
 			if (file_exists($lsPathModule))
 			{
 				$lsFileLicense = $this->getLicense($lsModule);
 				
+				$this->saveFile($lsPathModuleConfig, 'module', $lsFileLicense, $lsModule);
+				
 				$lsPathModuleConfig = $lsPathModule . DS . 'config';
 				$this->createDir($lsPathModuleConfig);	
-				$this->saveFile($lsPathModuleConfig, 'help', $lsFileLicense, $lsModule);
+				$this->saveFile($lsPathModuleConfig, 'module.config', $lsFileLicense, $lsModule);
 					
+				$lsPathView = $lsPathModule . DS . 'view';
+				$this->createDir($lsPathView);
+				$lsPathViewModule = $lsPathView . DS . $lsModule;
+				$this->createDir($lsPathViewModule);
+				$lsPathViewController = $lsPathViewModule . DS . $lsModule;
+				$this->createDir($lsPathViewController);
+				
 				$lsPathSrc = $lsPathModule . DS . 'src';
 				$this->createDir($lsPathSrc);
 										
@@ -198,12 +204,13 @@ class CmsController extends ToolAbstract
 						$this->createDir($lsPathEntity);
 						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense, $lsModule);
 						
-						$lsPathRepository = $lsPathSrcModule . DS . 'Repository';
-						$this->createDir($lsPathRepository);
-						$this->saveFile($lsPathRepository, 'Repository', $lsFileLicense, $lsModule);
+						$lsPathForm = $lsPathSrcModule . DS . 'Form';
+						$this->createDir($lsPathForm);
+						$this->saveFile($lsPathForm, 'Form', $lsFileLicense, $lsModule);
 						
-						$lsPathView = $lsPathSrcModule . DS . 'View';
-						$this->createDir($lsPathView);
+						$lsPathGrid = $lsPathSrcModule . DS . 'Grid';
+						$this->createDir($lsPathGrid);
+						$this->saveFile($lsPathGrid, 'Grid', $lsFileLicense, $lsModule);
 						
 						$this->setModuleAutoload($lsPathConfig, $lsModule, $lsClient);
 					}
