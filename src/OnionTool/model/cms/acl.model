@@ -1,0 +1,144 @@
+<?php
+#%LICENSE%#
+return array(
+    'acl' => array(
+    	'context' => array(
+    		//IPs
+    		'?.?.?.?' => array( // from any IP address
+    			'denied' => false,
+    			'user-agent' => array(
+    				'*' => '' // from any user-agent and without token
+    			)
+    		),
+    	),
+        'roles' => array(
+            'guest'   => null,
+	    	'client' => 'guest',
+            'admin' => 'client'
+        ),
+        'resources' => array(
+            'allow' => array(
+				'Index' => array(
+					'index' => 'guest',					
+					'message' => 'guest',
+				),
+            	'Backend' => array(
+            		'index' => 'client',
+            		'message' => 'guest',
+            		'push' => 'guest',
+            		'clear-flash' => 'guest',
+            	),
+				'Access' => array(
+					'login' => 'guest',
+					'logout' => 'guest',
+					'forgotten-password' => 'guest',
+					'message' => 'guest',
+					'facebook' => 'guest',
+				),
+	           	'LogAccess' => array(
+            		'index' => 'admin',
+            		'trash' => 'admin',
+            		'add' => 'admin',
+            		'edit' => 'admin',
+            		'view' => 'admin',
+            		'move' => 'admin',
+            		'delete' => 'admin',
+            		'move-list' => 'admin',
+            		'delete-list' => 'admin',
+            		'search-select' => 'admin',
+            		'search' => 'admin',
+            		'message' => 'guest',
+	           	),
+            	'LogEvent' => array(
+            		'index' => 'admin',
+            		'trash' => 'admin',
+            		'add' => 'admin',
+            		'edit' => 'admin',
+            		'view' => 'admin',
+            		'move' => 'admin',
+            		'delete' => 'admin',
+            		'move-list' => 'admin',
+            		'delete-list' => 'admin',
+            		'search-select' => 'admin',
+            		'search' => 'admin',
+            		'message' => 'guest',
+            	),
+            	'Registration' => array(
+            		'index' => 'guest',
+            		'message' => 'guest',
+            		'add' => 'guest'
+            	),
+            	'ContactUs' => array(
+            		'index' => 'guest',
+            		'send' => 'guest'
+            	),
+            	'Person' => array(
+            		'index' => 'admin',
+            		'trash' => 'admin',
+            		'add' => 'admin',
+            		'edit' => 'admin',
+            		'view' => 'admin',
+            		'move' => 'admin',
+            		'delete' => 'admin',
+            		'move-list' => 'admin',
+            		'delete-list' => 'admin',
+            		'search-select' => 'admin',
+            		'search' => 'admin',
+            		'message' => 'admin',
+            		'csv' => 'admin',
+            		'pdf' => 'admin'
+            	),
+            	'User' => array(
+            		'index' => 'admin',
+            		'trash' => 'admin',
+            		'add' => 'admin',
+            		'edit' => 'admin',
+            		'view' => 'admin',
+            		'move' => 'admin',
+            		'delete' => 'admin',
+            		'move-list' => 'admin',
+            		'delete-list' => 'admin',
+            		'search-select' => 'admin',
+            		'search' => 'admin',
+            		'message' => 'admin',
+            		'csv' => 'admin',
+            		'pdf' => 'admin',
+            		'generate-password' => 'guest',
+            		'change-password' => 'client',
+            		'change-phone-extension' => 'admin',
+            	),
+            	'UserGroup' => array(
+            		'index' => 'admin',
+            		'trash' => 'admin',
+            		'add' => 'admin',
+            		'edit' => 'admin',
+            		'view' => 'admin',
+            		'move' => 'admin',
+            		'delete' => 'admin',
+            		'move-list' => 'admin',
+            		'delete-list' => 'admin',
+            		'search-select' => 'admin',
+            		'search' => 'admin',
+            		'message' => 'admin',
+            		'csv' => 'admin',
+            		'pdf' => 'admin'
+            	),
+            	'Frontend' => array(
+            		'index' => 'guest',
+            		'trash' => 'guest',
+            		'add' => 'guest',
+            		'edit' => 'guest',
+            		'view' => 'guest',
+            		'move' => 'guest',
+            		'delete' => 'guest',
+            		'move-list' => 'guest',
+            		'delete-list' => 'guest',
+            		'search-select' => 'guest',
+            		'search' => 'guest',
+            		'message' => 'guest',
+            		'csv' => 'guest',
+            	),
+            )
+        )
+    )
+);

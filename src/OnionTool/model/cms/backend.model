@@ -1,0 +1,21 @@
+<?php
+#%LICENSE%# 
+return array(
+	'meta' => array(
+		'admLogo'			=> '',
+		'admCSS' 			=> '',
+		'doctype' 			=> 'XHTML1_RDFA',
+		'viewport' 			=> 'width=device-width, initial-scale=1',
+		'siteTitle' 		=> 'Onion App',
+		'titleSeparator'	=> ' - ',
+		'pageTitle' 		=> 'ADM AREA',
+		'charset' 			=> 'UTF-8',
+		'lang' 				=> 'pt',
+		'locale' 			=> 'pt_BR',
+		'pragma' 			=> 'no-cache', // no-cache | public,
+		'sysName'			=> 'm3uzz'
+	),
+	'moduleConf' => array(
+
+	),
+);

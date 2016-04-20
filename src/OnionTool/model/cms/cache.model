@@ -1,0 +1,12 @@
+<?php
+#%LICENSE%#
+return array(
+	'enable' 	=> false,
+	'type'		=> 'filesystem',
+	'cacheDir'	=> CLIENT_DIR . DS . 'data' . DS . 'cache',
+	'lifeTime' 	=> 86400,
+	
+	'exceptions' => array(
+		'module/controller/action',
+	),	
+);

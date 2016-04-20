@@ -1,0 +1,11 @@
+<?php
+#%LICENSE%#
+return array(
+	'ModuleName' => array(
+		'FormName' => array(
+			'FormFieldName' => array(
+				'FormFieldProperty' => 'MixValue',	
+			),
+		),
+	),
+);

@@ -1,0 +1,63 @@
+<?php
+#%LICENSE%#
+return array(
+	'enable'		=> true,
+	'maintenance'	=> false,
+	'environment'	=> APP_ENV,
+	'name'			=> '#%CLIENT-NAME%#',	//client
+	'resource'		=> '#%CLIENT-FOLDER%#',	//client folder
+	'id'			=> '',					//token
+	'icon'			=> '/img/favicon.ico',
+	'title'			=> '#%PROJECT-TITLE%#',
+	'description'	=> '#%PROJECT-DESCRIPTION%#',
+	'keywords'		=> '#%PROJECT-KEYWORDS%#',
+	'help'			=> '#%PROJECT-HELP%#',
+	'date'			=> '#%DATE%#',
+	'url' => array(
+		'site'		=> 'http://#%DOMAIN%#',
+		'admin'		=> 'http://#%DOMAIN%#',
+		'js' 		=> 'http://#%DOMAIN%#',
+		'css' 		=> 'http://#%DOMAIN%#',
+		'img' 		=> 'http://#%DOMAIN%#',
+		'service' 	=> '',
+	),		
+	'settings' => array(
+		'sessionLifeTime' 	=> 1209600, // 14 days
+		'criptPassword'		=> true,
+		'staticSalt'		=> '#%STATICSALT%#',
+		'CHMOD'				=> 0755,
+		'CHOWN'				=> 'www-data',
+		'CHGRP'				=> 'www-data',
+		'cacheConfig'		=> false,
+		'pushMensage'		=> true,
+	),
+	'translator' => array(
+		'type'		=> 'gettext',
+		'locale'	=> 'pt_BR',
+		'base_dir'	=> BASE_DIR . DS . 'vendor' . DS . 'm3uzz' . DS . 'onionfw' . DS . 'language' . DS,
+		'pattern'  	=> '%s.mo',
+		'datetime'	=> 'America/Sao_Paulo',
+		'local'		=> 'br',
+	),
+	'output' => array(
+		'encoding'		=> 'UTF-8',
+		'contetType'	=> 'text/html',
+	),
+		
+	'modules'	=> include 'modules.php',
+	'plugins' 	=> include 'plugins.php',	
+	'admin'		=> include 'backend.php',
+	'front'		=> include 'frontend.php',
+	'layout'	=> include 'layout.php',
+	'hooks' 	=> include 'hooks.php',
+	'cache'		=> include 'cache.php',
+	'db' 		=> include 'db.php',
+	'service'	=> include 'service.php',
+	'mail' 		=> include 'mail.php',
+	'log' 		=> include 'log.php',
+	'status' 	=> include 'status.php',
+	'form' 		=> include 'form.php',
+	'table'		=> include 'table.php',
+	'acl'		=> include 'acl.php',
+	'menu'		=> include 'menu.php',
+);

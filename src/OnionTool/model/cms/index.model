@@ -1,0 +1,11 @@
+<?php
+#%LICENSE%#
+/**
+ * This makes our life easier when dealing with paths. Everything is relative
+ * to the application root now.
+ */
+defined('CLIENT_DIR') || define('CLIENT_DIR', realpath(dirname(__DIR__)));
+defined('BASE_DIR') || define('BASE_DIR', realpath(dirname(dirname(dirname(__DIR__)))));
+chdir(BASE_DIR);
+
+require 'onionInit.php';

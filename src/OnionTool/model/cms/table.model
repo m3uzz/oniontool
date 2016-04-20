@@ -1,0 +1,9 @@
+<?php
+#%LICENSE%#
+return array(
+	'TableName' => array(
+		'fieldName' => array(
+			'default' =>  0
+		),
+	),
+);

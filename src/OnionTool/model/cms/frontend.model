@@ -1,0 +1,73 @@
+<?php
+#%LICENSE%#
+return array(
+	'meta' => array(
+		'logoSite'			=> '',
+		'logoMobile'		=> '',
+		'frontCSS'			=> '',
+		'doctype' 			=> 'XHTML1_RDFA',
+		'viewport' 			=> 'width=device-width, initial-scale=1',
+		'siteTitle' 		=> 'Onion App',
+		'titleSeparator' 	=> ' - ',
+		'pageTitle' 		=> '',
+		'keywords' 			=> '',
+		'description' 		=> '',
+		'favIcon'			=> '/img/favicon.ico',
+		'charset' 			=> 'UTF-8',
+		'lang' 				=> 'pt',
+		'locale' 			=> 'pt_BR',
+		'author' 			=> 'Onion',
+		'authorSite'		=> 'm3uzz.com',
+		'robots' 			=> 'NONE',
+		'classification' 	=> 'Association',
+		'revisitAfter' 		=> '1 days',
+		'pragma' 			=> 'no-cache', // no-cache ou public
+		'distribution' 		=> 'Global',
+		'type' 				=> '',
+		'image' 			=> '',
+		'copyright' 		=> 'm3uzz',
+		'sysName'			=> ''
+	),
+	'contact' => array(
+		array(
+			'type' 			=> 'phone',
+			'label'			=> '',
+			'contact' 		=> '',
+			'value'			=> '',
+		),
+		array(
+			'type' 			=> 'email',
+			'label'			=> '',
+			'contact' 		=> '',
+			'value'			=> '',
+		),
+	),	
+	'address' => array(
+		array(
+			'label'			=> 'Comercial',
+			'country' 		=> 'Brasil',
+			'state' 		=> 'Minas Gerais',
+			'city' 			=> 'Uberaba',
+			'neigbour'		=> '',
+			'street' 		=> '',
+			'number' 		=> '',
+			'complement' 	=> '',
+			'gmaps' 		=> '',
+		),
+	),
+	'socialNetwork' => array(
+		'facebook' 			=> 'http://facebook.com/',
+		'twitter' 			=> 'http://twitter.com/',
+		'vine'				=> 'http://vine.co/',
+		'youtube' 			=> 'http://youtube.com/user/',
+		'googlePlus' 		=> 'http://plus.google.com/',
+		'instagram'			=> 'http://instagram.com/',
+	),
+	'APIKey' => array(
+		'googleAnalytics' 	=> '',
+		'gWebmaster'		=> '',
+		'liveTools'			=> '',
+		'facebookId' 		=> '',
+		'googleId' 			=> '',
+	),
+);

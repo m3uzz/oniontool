@@ -1,0 +1,48 @@
+{
+    "name": "m3uzz/oniontool",
+    "description": "Onion Tool",
+    "homepage": "http://onion.m3uzz.com/",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Humberto S Lourenco",
+            "email": "betto@m3uzz.com"
+        }
+    ],
+    "keywords": [
+    	"m3uzz",
+        "onion",
+        "onionsrv",
+        "service",
+        "framework",
+        "lite"
+    ],
+    "type": "library",
+    "repositories": [
+        {
+            "type": "library",
+            "library": {
+                "name": "m3uzz/oniontool",
+                "version": "master",
+                "dist": {
+                    "url": "https://github.com/m3uzz/oniontool/archive/master.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "https://github.com/m3uzz/oniontool.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "m3uzz/onionsrv": "master"
+    },
+    "autoload": {
+        "psr-0": {
+            "OnionTool\\": "src/"
+        }
+    }
+}

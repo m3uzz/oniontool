@@ -1,0 +1,48 @@
+<?php
+#%LICENSE%#
+return array(
+	'debug' => array(
+		'JS'			=> true,
+		'PHP' => array(
+			'enable' 	=> true,
+			'output' 	=> 'FIREBUG', // "FIREBUG", "COMMENT", "DISPLAY", "BUFFER"
+		),
+	),
+	'log' => array(
+		'db' => array(
+			'enable' 	=> false,
+			'fileName'	=> 'db',
+		),
+		'access' => array(
+			'enable' 	=> false,
+			'output' 	=> 'DB', // "DB", "STREAM"
+			'table'		=> 'LogAccess',
+			'fileName'	=> 'access',			
+		),
+		'search' => array(
+			'enable' 	=> false,
+			'output' 	=> 'DB', // "DB", "STREAM"
+			'table'		=> 'LogSearch',
+			'fileName'	=> 'search',
+		),
+		'click' => array(
+			'enable' 	=> false,
+			'output' 	=> 'DB', // "DB", "STREAM"
+			'table'		=> 'LogClick',
+			'fileName'	=> 'click',
+		),
+		'view' => array(
+			'enable' 	=> false,
+			'output' 	=> 'DB', // "DB", "STREAM"
+			'table'		=> 'LogView',
+			'fileName'	=> 'view',
+		),
+		'events' => array(
+			'enable' 	=> false,
+			'output' 	=> 'DB', // "DB", "STREAM"
+			'table'		=> 'LogEvent',
+			'fileName'	=> 'events',
+		),
+		'logDir'		=> CLIENT_DIR . DS . 'data' . DS . 'logs',
+	),	
+);

@@ -1,0 +1,21 @@
+<?php
+#%LICENSE%#
+return array(
+	'indexController' 	=> 'Frontend\Controller\Frontend',
+	'indexAction' 		=> 'index',
+	'indexParam' 		=> '',	
+	'directAssets' 		=> false,
+	'defaultDir'		=> 'layout',
+	'clientDir'			=> CLIENT_DIR,
+	'frontend'			=> CLIENT_DIR.DS.'public'.DS.'layout',
+	'backend'			=> BASE_DIR.DS.'layout'.DS.'backend',
+	'exception'			=> BASE_DIR.DS.'exception',
+	
+	'module_layouts' => array(
+		'Frontend' 		=> 'layout/home',
+		'Access' 		=> 'layout/home',
+		'Backend' 		=> 'layout/layout',
+		'Popup' 		=> 'layout/popup',
+		'Container' 	=> 'layout/container',
+	),
+);

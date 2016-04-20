@@ -1,0 +1,18 @@
+<?php
+#%LICENSE%# 
+return array(
+	'transporter' 		=> 'NONE', // sendmail | SMTP | NONE
+	'fromEmail' 		=> 'webmaster@webmaster.com',
+	'fromName' 			=> 'Onion App',
+	'replayToEmail' 	=> 'webmaster@webmaster.com',
+	'replayToName' 		=> 'Onion App',
+	'charset' 			=> 'UTF-8',
+	'html' 				=> true,
+	'smtp' => array(
+		'server' 	=> '',
+		'security'	=> 'ssl',
+		'port' 		=> '465',
+		'login' 	=> '',
+		'password' 	=> '',
+	),
+);

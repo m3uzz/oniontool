@@ -1,0 +1,13 @@
+<?php
+#%LICENSE%#
+return array(
+	'available' => array(
+		'LogEvent' 		=> true,
+		'LogAccess' 	=> true,
+		'Person' 		=> true,
+		'User' 			=> true,
+		'UserGroup' 	=> true,
+		'ContactUs' 	=> true,
+		'Frontend'		=> true,
+	),	
+);

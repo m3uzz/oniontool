@@ -1,0 +1,7 @@
+<?php
+#%LICENSE%#
+return array(
+	'TableName' => array(
+		'FieldName' => 'value',
+	),
+);
