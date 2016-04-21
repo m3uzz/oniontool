@@ -43,7 +43,6 @@
  */
 
 namespace OnionTool\Controller;
-use OnionTool\Controller\ToolAbstract;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
@@ -70,6 +69,20 @@ class CmsController extends ToolAbstract
 	public function cmsAction ()
 	{
 		$this->help(true);
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function tool2BinAction ()
+	{
+		$lsOrigem = BIN_DIR . DS . "cmstool.php";
+		$lsLink = BASE_DIR . DS . "bin" . DS . "cmstool";
+		System::simblink($lsOrigem, $lsLink);
+		
+		$loSrv = new SrvController();
+		$loSrv->tool2BinAction();
 	}
 	
 	

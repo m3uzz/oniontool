@@ -46,6 +46,7 @@
 defined('DS')		|| define('DS', DIRECTORY_SEPARATOR);
 defined('PS')  		|| define('PS', PATH_SEPARATOR);
 defined('EOF') 		|| define('EOF', chr(13).chr(10));
+defined('BIN_DIR') 	|| define('BIN_DIR', __DIR__);
 defined('BASE_DIR') 	|| define('BASE_DIR', realpath(dirname(dirname(dirname(dirname(__DIR__))))));
 defined('VENDOR_DIR') 	|| define('VENDOR_DIR', BASE_DIR . DS . 'vendor');
 defined('CLIENT_DIR') 	|| define('CLIENT_DIR', BASE_DIR . DS . 'client');

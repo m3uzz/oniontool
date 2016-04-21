@@ -43,7 +43,6 @@
  */
 
 namespace OnionTool\Controller;
-use OnionTool\Controller\ToolAbstract;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
@@ -58,9 +57,6 @@ class SrvController extends ToolAbstract
 	public function init ()
 	{
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'srv';
-		
-		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequest('module'));
 	}
 
 
@@ -76,8 +72,22 @@ class SrvController extends ToolAbstract
 	/**
 	 * 
 	 */
+	public function tool2BinAction ()
+	{
+		$lsOrigem = BIN_DIR . DS . "srvtool.php";
+		$lsLink = BASE_DIR . DS . "bin" . DS . "srvtool";
+		System::simblink($lsOrigem, $lsLink);
+	}
+	
+	
+	/**
+	 * 
+	 */
 	public function newClientAction ()
 	{
+		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequest('module'));
+		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
 		$this->createDir($lsPathClient);
@@ -141,6 +151,9 @@ class SrvController extends ToolAbstract
 	 */
 	public function newServiceAction ()
 	{
+		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequest('module'));
+		
 		if ($this->_sModuleName == null)
 		{
 			Debug::exitError("The param module is required! Please, use --help for further information.");
