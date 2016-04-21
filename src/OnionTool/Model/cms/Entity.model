@@ -1,0 +1,78 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Onion\Entity\Entity;
+use Onion\Lib\String;
+use Onion\Log\Debug;
+
+/**
+ * ORM\Entity
+ * ORM\Table(name="#%MODULE%#")
+ * ORM\Entity(repositoryClass="#%MODULE%#\Entity\#%MODULE%#Repository")
+ */
+abstract class #%MODULE%# extends Entity
+{
+
+	protected $_sEntity = '#%MODULE%#\Entity\#%MODULE%#';
+
+	/**
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 * @ORM\Column(type="integer")
+	 */
+	protected $id;
+
+	/**
+	 * @ORM\Column(type="integer")
+	 * @ORM\Column(nullable=true)
+	 */
+	protected $User_id;
+
+	/**
+	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(nullable=true)
+	 */
+	protected $dtInsert;
+
+	/**
+	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(nullable=true)
+	 */
+	protected $dtUpdate;
+
+	/**
+	 * @ORM\Column(type="integer")
+	 * @ORM\Column(nullable=true)
+	 */
+	protected $numStatus = 0;
+
+	/**
+	 * @ORM\Column(type="boolean")
+	 * @ORM\Column(nullable=true)
+	 */
+	protected $isActive = 1;
+
+	
+	/**
+	 */
+	public function getObject ()
+	{
+		return $this;
+	}
+
+	
+	/**
+	 */
+	public function getFormatedData ()
+	{
+		$laData['id'] = $this->id;
+		$laData['dtInsert'] = $this->dtInsert;
+		$laData['dtUpdate'] = $this->dtUpdate;
+		$laData['numStatus'] = $this->numStatus;
+		$laData['isActive'] = $this->isActive;		
+			
+		return $laData;
+	}
+}
+	

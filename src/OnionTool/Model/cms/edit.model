@@ -1,0 +1,4 @@
+<?php
+#%LICENSE%#
+$loForm->editForm($this, $lnId, $lsRoute, $lsTitleS, $lsBack);
+	

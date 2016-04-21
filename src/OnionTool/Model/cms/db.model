@@ -1,5 +1,5 @@
 <?php
-#%LICENSE%#
+
 return array(
 	'production' => array(
 		'driver'	=> 'PDOMySql', // PDOMySql, pdo, Mysqli, Sqlsrv, Pdo_Sqlite, Pdo_Mysql, Pdo=OtherPdoDriver

@@ -48,20 +48,20 @@ return array(
 			"newClient" => array(
 				"desc" => "Create a new client structure folder",
 				"params" => array(
-					"client" => "Client folder name, eg.: onionapp.com [required]",
+					"folder" => "Client folder name, eg.: onionapp.com [required]",
 					"module" => "Module name, eg.: OnionApp [optional]",
-					"name" => "Author name [optional]",
+					"author" => "Author name [optional]",
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",
 				),
 			),
-			"newModule" => array(
+			"newService" => array(
 				"desc" => "Create a new module for a existent client",
 				"params" => array(
-					"client" => "Client folder name, eg.: onionapp.com [required]",
+					"folder" => "Client folder name, eg.: onionapp.com [required]",
 					"module" => "Module name, eg.: OnionApp [required]",
-					"name" => "Author name [optional]",
+					"author" => "Author name [optional]",
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",
@@ -72,9 +72,11 @@ return array(
 			"newClient" => array(
 				"desc" => "Create a new client structure folder",
 				"params" => array(
-					"client" => "Client folder name, eg.: onionapp.com [required]",
+					"folder" => "Client folder name, eg.: onionapp.com [required]",
+					"client" => "Client name, eg.: Onion [optional]",
+					"domain" => "Host domain, eg.: onionapp.com [optional]",
 					"module" => "Module name, eg.: OnionApp [optional]",
-					"name" => "Author name [optional]",
+					"author" => "Author name [optional]",
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",
@@ -83,9 +85,9 @@ return array(
 			"newModule" => array(
 				"desc" => "Create a new module for a existent client",
 				"params" => array(
-					"client" => "Client folder name, eg.: onionapp.com [required]",
+					"folder" => "Client folder name, eg.: onionapp.com [required]",
 					"module" => "Module name, eg.: OnionApp [required]",
-					"name" => "Author name [optional]",
+					"author" => "Author name [optional]",
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",

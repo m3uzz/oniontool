@@ -56,7 +56,7 @@ return array(
 		'enable' => false,
 		'folder' => '/tmp',
 		'chmod' => 0775,
-		'chown'	=> 'www-data',
+		'chown'	=> getenv("GROUP"),
 		'chgrp'	=> 'www-data',
 	),
 	'debug' => array(
@@ -64,7 +64,7 @@ return array(
 	),
 	'system' => array(
 		'chmod' => 0775,
-		'chown'	=> 'www-data',
+		'chown'	=> getenv("GROUP"),
 		'chgrp'	=> 'www-data',
 	),
 	'time-zone' => 'America/Sao_Paulo',

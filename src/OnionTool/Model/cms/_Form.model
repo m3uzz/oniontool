@@ -1,0 +1,118 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Form;
+use Onion\Form\Form;
+use Onion\Form\Element\Csrf;
+use Onion\Log\Debug;
+use Onion\Lib\String;
+use Onion\I18n\Translator;
+use Onion\InputFilter\InputFilter;
+use Onion\InputFilter\Factory as InputFactory;
+
+class #%MODULE%#Form extends Form
+{
+
+	/**
+	 */
+	public function __construct ()
+	{
+		$this->_sModule = '#%MODULE%#';
+		
+		$this->_sForm = '#%MODULE%#';
+		
+		$this->_sWindowType = 'default';
+		
+		$this->_sRequestType = 'post';
+		
+		$this->_sResponseType = 'html';
+		
+		$this->_sCancelBtnType = 'cancel';
+		
+		// we want to ignore the name passed
+		parent::__construct($this->_sForm);
+	}
+
+	
+	/**
+	 */
+	public function setForm ()
+	{
+		$this->setAttribute('method', 'post');
+		$this->setAttribute('role', 'form');
+		
+		$lbRequired = true;
+		$lbReadOnly = false;
+		
+		if ($this->_sActionType == 'edit')
+		{
+			$lbRequired = false;
+			$lbReadOnly = true;
+		}
+		
+		$this->add(array(
+			'name' => 'id',
+			'attributes' => array(
+				'type' => 'hidden'
+			)
+		));
+		
+		$this->add(new Csrf('security'));
+		
+		$this->add(array(
+			'name' => 'submit',
+			'attributes' => array(
+				'type' => 'submit',
+				'value' => Translator::i18n('Salvar'),
+				'id' => 'submitbutton',
+				'class' => 'btn btn-primary'
+			)
+		));
+		
+		// Load and set the client specific configuration for this form
+		$this->clientSets();
+	}
+
+	
+	/**
+	 */
+	public function getInputFilter ()
+	{
+		$loInputFilter = new InputFilter();
+		$loInputFilter->setForm($this);
+		
+		$loFactory = new InputFactory();
+		
+		$loInputFilter->add($loFactory->createInput(array(
+			'name' => 'id',
+			'required' => true,
+			'filters' => array(
+				array(
+					'name' => 'Int'
+				)
+			)
+		)));
+		
+		$loInputFilter->add($loFactory->createInput(array(
+			'name' => 'User_id',
+			'required' => false,
+			'filters' => array(
+				array(
+					'name' => 'Int'
+				)
+			)
+		)));
+			
+			
+		return $loInputFilter;
+	}
+
+
+	/**
+	 *
+	 */
+	public function isValid ()
+	{
+		return parent::isValid();
+	}
+}
+	

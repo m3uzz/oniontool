@@ -43,12 +43,14 @@
  */
 
 $lgValidate = array(
-	'client' => '^[a-z\.]{3,40}$',
+	'client' => '',
+	'folder' => '^[a-z0-9\.]{3,80}$',
+	'domain' => '^[a-z0-9\.]{3,80}$',
 	'module' => '',
 	'author' => '',
 	'email' => '',
 	'link' => '',
-	'cini' => '',
+	'cinit' => '',
 );
 
 return array(

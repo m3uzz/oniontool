@@ -1,0 +1,94 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Controller;
+use Onion\Mvc\Controller\ControllerAction;
+use Onion\View\Model\ViewModel;
+use Onion\Log\Debug;
+use Onion\I18n\Translator;
+use Onion\Paginator\Pagination;
+use Onion\Application\Application;
+use Onion\Lib\Search;
+use Onion\Lib\String;
+use Onion\Lib\UrlRequest;
+use Onion\Export\Pdf;
+use Onion\Config\Config;
+
+class #%MODULE%#Controller extends ControllerAction
+{
+
+	/**
+	 */
+	public function __construct ()
+	{
+		$this->_sTable = '#%MODULE%#';
+		
+		$this->_sModule = '#%MODULE%#';
+		
+		$this->_sRoute = '#%ROUTE%#';
+		
+		$this->_sWindowType = 'default';
+		
+		$this->_sResponse = 'html';
+		
+		$this->_sEntity = '#%MODULE%#\Entity\#%MODULE%#Basic';
+		
+		$this->_sEntityExtended = '#%MODULE%#\Entity\#%MODULE%#Extended';
+		
+		$this->_sForm = '#%MODULE%#\Form\#%MODULE%#Form';
+		
+		$this->_sTitleS = Translator::i18n('#%MODULE%#');
+		
+		$this->_sTitleP = Translator::i18n('#%MODULE%#');
+		
+		$this->_aSearchFields = array(
+			'a.id' => Translator::i18n('Id')
+		);
+		
+		$this->_sSearchFieldDefault = 'a.id';
+		
+		$this->_sGridOrderCol = 'id';
+		
+		$this->_sGridOrder = 'ASC';
+		
+		$this->_aGridCols = array(
+			'id' => Translator::i18n('Id'),
+			Translator::i18n('Cadastro')
+		);
+		
+		$this->_aGridAlign = array();
+		
+		$this->_aGridWidth = array();
+		
+		$this->_aGridColor = array();
+		
+		$this->_aGridFields = array(
+			'id',
+			'dtInsert'
+		);
+		
+		$this->_nGridNumRows = 30;
+		
+		$this->_bSearch = true;
+		
+		$this->_aSearchGridCols = array(
+			'id' => Translator::i18n('Id')
+		);
+		
+		$this->_aSearchGridAlign = array();
+			
+		$this->_aSearchGridWidth = array();
+			
+		$this->_aSearchGridColor = array(
+			'', 
+			'#f6f6f6'
+		);		
+			
+		$this->_aSearchGridFields = array(
+			'id'
+		);
+			
+		$this->_sSearchLabelField = 'id';
+		
+		$this->_nSearchGridNumRows = 6;	
+	}
+}

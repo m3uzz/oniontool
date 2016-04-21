@@ -1,0 +1,17 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Onion\Lib\String;
+use Onion\Log\Debug;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="#%MODULE%#")
+ * @ORM\Entity(repositoryClass="#%MODULE%#\Entity\#%MODULE%#Repository")
+ */
+class #%MODULE%#Basic extends #%MODULE%#
+{
+
+	protected $_sEntity = '#%MODULE%#\Entity\#%MODULE%#Basic';
+}

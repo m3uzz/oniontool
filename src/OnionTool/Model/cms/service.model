@@ -1,5 +1,5 @@
 <?php
-#%LICENSE%#
+
 return array(
 	'onionsrv' => array(
 		'production' => array(

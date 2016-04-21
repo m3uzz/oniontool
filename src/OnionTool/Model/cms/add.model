@@ -1,0 +1,4 @@
+<?php
+#%LICENSE%#
+$loForm->addForm($this, $lsRoute, $lsTitleS, $lsBack);
+	

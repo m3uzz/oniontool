@@ -1,5 +1,5 @@
 <?php
-#%LICENSE%# 
+
 return array(
 	'access' => array(
 		//IPs
@@ -14,7 +14,7 @@ return array(
 		'enable' => false,
 		'folder' => DATA_DIR . '/logs',
 		'chmod' => 0775,
-		'chown'	=> 'www-data',
+		'chown'	=> getenv("GROUP"),
 		'chgrp'	=> 'www-data',
 	),
 	'debug' => array(
@@ -22,7 +22,7 @@ return array(
 	),
 	'system' => array(
 		'chmod' => 0775,
-		'chown'	=> 'www-data',
+		'chown'	=> getenv("GROUP"),
 		'chgrp'	=> 'www-data',
 	),
 	'time-zone' => 'America/Sao_Paulo',

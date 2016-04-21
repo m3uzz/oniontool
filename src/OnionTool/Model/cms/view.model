@@ -1,0 +1,5 @@
+<?php
+#%LICENSE%#
+$this->headTitle($lsTitle);
+echo $lsView;
+	

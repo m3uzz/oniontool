@@ -55,6 +55,76 @@ abstract class ToolAbstract extends AbstractController
 
 	protected $_sModelPath;
 	
+	protected $_sClientFolder;
+	
+	protected $_sClientName;
+	
+	protected $_sClientDomain;
+	
+	protected $_sModuleName = null;
+	
+	
+	/**
+	 * 
+	 * @param string $psFolder
+	 */
+	public function setClientFolder($psFolder)
+	{
+		$this->_sClientFolder = $psFolder;
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psDomain
+	 */
+	public function setClientDomain($psDomain)
+	{
+		$this->_sClientDomain = $psDomain;
+		
+		if (empty($this->_sClientDomain))
+		{
+			$this->_sClientDomain = $this->_sClientFolder;
+		}
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psClient
+	 */
+	public function setClientName($psClient)
+	{
+		$this->_sClientName = $psClient;
+		
+		if (empty($this->_sClientName))
+		{
+			$laClientFolder = explode(".", $this->_sClientFolder);
+			$this->_sClientName = ucfirst($laClientFolder[0]);
+		}
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psModule
+	 */
+	public function setModuleName($psModule)
+	{
+		if (!empty($psModule))
+		{
+			$this->_sModuleName = ucfirst($psModule);
+		}
+
+		return $this;
+	}
+	
 	
 	/**
 	 *
@@ -67,20 +137,84 @@ abstract class ToolAbstract extends AbstractController
 	{
 		System::createDir($psPath, $pnChmod, $psChown, $psChgrp);
 		$lsFileContent = System::localRequest($this->_sModelPath . DS . "deny.model");
-		Debug::debug($lsFileContent);
 		$lsFilePath = $psPath . DS . '.htaccess';
-		Debug::debug($lsFilePath);
 		System::saveFile($lsFilePath, $lsFileContent);
+	}
+	
+	
+	/**
+	 *
+	 * @param string $psPathConfig
+	 */
+	public function setModuleAutoload ($psPathConfig)
+	{
+		$lsModulesPath = $psPathConfig . DS . "modules.php";
+		$lsAclPath = $psPathConfig . DS . "acl.php";
+		$lsMenuPath = $psPathConfig . DS . "menu.php";
+		
+		if (file_exists($lsModulesPath))
+		{
+			$laModules = include ($lsModulesPath);
+		
+			$laModules['available'][$this->_sModuleName] = true;
+				
+			$lsFileContent = System::arrayToFile($laModules);
+		
+			System::saveFile($lsModulesPath, $lsFileContent);
+		}
+		
+		if (file_exists($lsAclPath))
+		{
+			$laAcl = include ($lsAclPath);
+		
+			$laAcl['acl']['resources']['allow'][$this->_sModuleName] = array(
+				'index' => 'admin',
+            	'trash' => 'admin',
+            	'add' => 'admin',
+            	'edit' => 'admin',
+            	'view' => 'admin',
+            	'move' => 'admin',
+            	'delete' => 'admin',
+            	'move-list' => 'admin',
+            	'delete-list' => 'admin',
+            	'search-select' => 'admin',
+            	'search' => 'admin',
+            	'message' => 'guest'
+			);
+		
+			$lsFileContent = System::arrayToFile($laAcl);
+		
+			System::saveFile($lsAclPath, $lsFileContent);
+		}
+		
+		if (file_exists($lsMenuPath))
+		{
+			$laMenu = include ($lsMenuPath);
+		
+			$lsRoute = String::slugfy($this->_sModuleName);
+			$lsModuleLabel = preg_replace("/_/", " ", ucfirst($lsRoute));
+			
+			$laMenu['admin'][$this->_sModuleName] = array(
+				'accesskey' => '',
+				'label' => $lsModuleLabel,
+				'link' => "/{$lsRoute}",
+				'description' => '',
+				'icon' => 'glyphicon glyphicon-cog',
+				'submenu' => null,
+			);
+		
+			$lsFileContent = System::arrayToFile($laMenu);
+		
+			System::saveFile($lsMenuPath, $lsFileContent);
+		}
 	}
 	
 	
 	/**
 	 * 
 	 * @param string $psPathConfig
-	 * @param string $psModule
-	 * @param string $psClient
 	 */
-	public function setModuleAutoload ($psPathConfig, $psModule, $psClient)
+	public function setSrvModuleAutoload ($psPathConfig)
 	{
 		$lsSrvModulePath = $psPathConfig . DS . "srv-module.php";
 		
@@ -96,9 +230,8 @@ abstract class ToolAbstract extends AbstractController
 				}
 			}
 			
-			$lsFileLicense = $this->getLicense($psClient);
-			$laModuleLoader[$psModule] = "//array(CLIENT_DIR . DS . 'service' . DS . '{$psModule}' . DS . 'src')";
-			$lsFileContent = "<?php\n{$lsFileLicense}\nreturn array(\n" . System::arrayToString($laModuleLoader) . ");";
+			$laModuleLoader[$this->_sModuleName] = "//array(CLIENT_DIR . DS . 'service' . DS . '{$this->_sModuleName}' . DS . 'src')";
+			$lsFileContent = "<?php\nreturn array(\n" . System::arrayToString($laModuleLoader) . ");";
 
 			System::saveFile($lsSrvModulePath, $lsFileContent);
 		}
@@ -107,19 +240,21 @@ abstract class ToolAbstract extends AbstractController
 
 	/**
 	 * 
+	 * @param string $psPackage
+	 * @return string
 	 */
 	public function getLicense ($psPackage)
 	{
-		$lsName = $this->getRequest('name', "Humberto Lourenço");
+		$lsAuthor = $this->getRequest('author', "Humberto Lourenço");
 		$lsEmail = $this->getRequest('email', "betto@m3uzz.com");
 		$lsLink = $this->getRequest('link', "http://github.com/m3uzz/onionsrv");
-		$lsCopyrightIni = $this->getRequest('cini', "2014");
+		$lsCopyrightIni = $this->getRequest('cinit', "2014");
 		
 		$lsLicensePath = $this->_sModelPath . DS . 'LICENSE.model';
 		$lsFileLicense = System::localRequest($lsLicensePath);
 		
 		Util::parse($lsFileLicense, "#%PACKAGE%#", $psPackage);
-		Util::parse($lsFileLicense, "#%AUTHOR%#", $lsName);
+		Util::parse($lsFileLicense, "#%AUTHOR%#", $lsAuthor);
 		Util::parse($lsFileLicense, "#%EMAIL%#", $lsEmail);
 		Util::parse($lsFileLicense, "#%LINK%#", $lsLink);
 		Util::parse($lsFileLicense, "#%COPYRIGHT%#", $lsCopyrightIni . "-" . date('Y'));
@@ -133,24 +268,26 @@ abstract class ToolAbstract extends AbstractController
 	 * @param string $psPath
 	 * @param string $psFile
 	 * @param string $psFileLicense
-	 * @param string $psModule
+	 * @param string $psFileType
 	 */
-	public function saveFile ($psPath, $psFile, $psFileLicense = "", $psModule = "")
+	public function saveFile ($psPath, $psFile, $psFileLicense = "", $psFileType = "php")
 	{
-		$lsFileName = "{$psModule}{$psFile}.php";
+		switch ($psFile)
+		{
+			case 'htaccess':
+				$lsFileName = ".{$psFile}";
+				break;
+			case 'Entity':
+				$lsFileName = "{$this->_sModuleName}.php";
+				break;
+			case 'actionIndex':
+				$lsFileName = "index.phtml";
+				break;
+			default:
+				$lsFileName = "{$psFile}.{$psFileType}";
+				$lsFileName = preg_replace("/_/", $this->_sModuleName, $lsFileName);
+		}
 		
-		if ($psFile == 'htaccess')
-		{
-			$lsFileName = ".{$psFile}";
-		}
-		elseif ($psFile == 'Entity')
-		{
-			$lsFileName = "{$psModule}.php";
-		}
-		elseif ($psFile == 'help')
-		{
-			$lsFileName = "help.php";
-		}
 		
 		$lsFilePath = $psPath . DS . $lsFileName;
 
@@ -159,35 +296,17 @@ abstract class ToolAbstract extends AbstractController
 			$lsFileContent = System::localRequest($this->_sModelPath . DS . "{$psFile}.model");
 			
 			Util::parse($lsFileContent, "#%LICENSE%#", $psFileLicense);
-			Util::parse($lsFileContent, "#%MODULE%#", $psModule);
-			Util::parse($lsFileContent, "#%ACTION%#", $this->getActionName($psModule));
+			Util::parse($lsFileContent, "#%MODULE%#", $this->_sModuleName);
+			Util::parse($lsFileContent, "#%ACTION%#", String::lcfirst($this->_sModuleName));
+			
+			Util::parse($lsFileContent, "#%ROUTE%#", String::slugfy($this->_sModuleName));
+			
+			Util::parse($lsFileContent, "#%PACKAGE%#", $this->_sClientFolder);
+			Util::parse($lsFileContent, "#%CLIENT-NAME%#", $this->_sClientName);
+			Util::parse($lsFileContent, "#%DATE%#", date('Y-m-d'));
+			Util::parse($lsFileContent, "#%DOMAIN%#", $this->_sClientDomain);
 			
 			System::saveFile($lsFilePath, $lsFileContent);
 		}
-	}
-	
-	
-	/**
-	 * 
-	 * @param string $psName
-	 * @return string
-	 */
-	public function getActionName ($psName)
-	{
-		$lsName = String::slugfy($psName);
-		$laName = explode("-", $lsName);
-		
-		if (is_array($laName))
-		{
-			$lsName = $laName[0];
-			unset($laName[0]);
-			
-			foreach($laName as $lsValue)
-			{
-				$lsName .= ucfirst($lsValue);
-			}
-		}
-		
-		return $lsName;
 	}
 }

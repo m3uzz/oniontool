@@ -58,6 +58,9 @@ class CmsController extends ToolAbstract
 	public function init ()
 	{
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'cms';
+		
+		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequest('module'));
 	}
 
 
@@ -75,36 +78,36 @@ class CmsController extends ToolAbstract
 	 */
 	public function newClientAction ()
 	{
-		$lsClient = $this->getRequest('client', "onionapp.com");
-		$lsModule = $this->getRequest('module');
+		$this->setClientDomain($this->getRequest('domain'));
+		$this->setClientName($this->getRequest('client'));
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
+		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
 		$this->createDir($lsPathClient);
 		
 		if (file_exists($lsPathClient))
 		{
-			$lsFileLicense = $this->getLicense($lsClient);
+			$lsFileLicense = $this->getLicense($this->_sClientFolder);
 			
 			$lsPathConfig = $lsPathClient . DS . 'config';			
 			$this->createDir($lsPathConfig);
-			$this->saveFile($lsPathConfig, 'acl', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'backend', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'cache', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'client.global', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'db', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'form', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'frontend', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'hooks', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'layout', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'log', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'mail', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'menu', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'modules', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'plugins', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'service', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'status', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'table', $lsFileLicense);
+			$this->saveFile($lsPathConfig, 'acl');
+			$this->saveFile($lsPathConfig, 'backend');
+			$this->saveFile($lsPathConfig, 'cache');
+			$this->saveFile($lsPathConfig, 'client.global');
+			$this->saveFile($lsPathConfig, 'db');
+			$this->saveFile($lsPathConfig, 'form');
+			$this->saveFile($lsPathConfig, 'frontend');
+			$this->saveFile($lsPathConfig, 'hooks');
+			$this->saveFile($lsPathConfig, 'layout');
+			$this->saveFile($lsPathConfig, 'log');
+			$this->saveFile($lsPathConfig, 'mail');
+			$this->saveFile($lsPathConfig, 'menu');
+			$this->saveFile($lsPathConfig, 'modules');
+			$this->saveFile($lsPathConfig, 'plugins');
+			$this->saveFile($lsPathConfig, 'service');
+			$this->saveFile($lsPathConfig, 'status');
+			$this->saveFile($lsPathConfig, 'table');
 
 			$lsPathData = $lsPathClient . DS . 'data';
 			$this->createDir($lsPathData, 0777);
@@ -144,7 +147,15 @@ class CmsController extends ToolAbstract
 			$this->createDir($lsPathModule);
 		}
 		
-		if ($lsModule == null)
+		$this->setModuleName("Backend");
+		$this->newModuleAction();
+		
+		$this->setModuleName("Frontend");
+		$this->newModuleAction();
+		
+		$this->setModuleName($this->getRequest('module'));
+		
+		if ($this->_sModuleName != null)
 		{
 			$this->newModuleAction();
 		}
@@ -156,66 +167,85 @@ class CmsController extends ToolAbstract
 	 */
 	public function newModuleAction ()
 	{
-		$lsClient = $this->getRequest('client', "onionapp.com");
-		$lsModule = $this->getRequest('module', "OnionApp");
-		$lsModule = ucfirst($lsModule);
+		if ($this->_sModuleName == null)
+		{
+			Debug::exitError("The param module is required! Please, use --help for further information.");
+		}
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
+		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		$lsPathModules = $lsPathClient . DS . 'module';
 		$lsPathConfig = $lsPathClient . DS . 'config';
 		
 		if (file_exists($lsPathModules))
 		{
-			$lsPathModule = $lsPathModules . DS . $lsModule;
+			$lsPathModule = $lsPathModules . DS . $this->_sModuleName;
 			$this->createDir($lsPathModule);
 			
 			if (file_exists($lsPathModule))
 			{
-				$lsFileLicense = $this->getLicense($lsModule);
+				$lsFileLicense = $this->getLicense($this->_sModuleName);
 				
-				$this->saveFile($lsPathModuleConfig, 'module', $lsFileLicense, $lsModule);
+				$this->saveFile($lsPathModule, 'Module', $lsFileLicense);
 				
 				$lsPathModuleConfig = $lsPathModule . DS . 'config';
 				$this->createDir($lsPathModuleConfig);	
-				$this->saveFile($lsPathModuleConfig, 'module.config', $lsFileLicense, $lsModule);
+				$this->saveFile($lsPathModuleConfig, 'module.config', $lsFileLicense);
 					
+				$lsModuleRoute = String::slugfy($this->_sModuleName);
+				
 				$lsPathView = $lsPathModule . DS . 'view';
 				$this->createDir($lsPathView);
-				$lsPathViewModule = $lsPathView . DS . $lsModule;
+				$lsPathViewModule = $lsPathView . DS . $lsModuleRoute;
 				$this->createDir($lsPathViewModule);
-				$lsPathViewController = $lsPathViewModule . DS . $lsModule;
+				$lsPathViewController = $lsPathViewModule . DS . $lsModuleRoute;
 				$this->createDir($lsPathViewController);
+				$this->saveFile($lsPathViewController, 'actionIndex', $lsFileLicense);
+				$this->saveFile($lsPathViewController, 'add', $lsFileLicense, 'phtml');
+				$this->saveFile($lsPathViewController, 'edit', $lsFileLicense, 'phtml');
+				$this->saveFile($lsPathViewController, 'message', $lsFileLicense, 'phtml');
+				$this->saveFile($lsPathViewController, 'trash', $lsFileLicense, 'phtml');
+				$this->saveFile($lsPathViewController, 'view', $lsFileLicense, 'phtml');
 				
 				$lsPathSrc = $lsPathModule . DS . 'src';
 				$this->createDir($lsPathSrc);
 										
 				if (file_exists($lsPathSrc))
 				{
-					$lsPathSrcModule = $lsPathSrc . DS . $lsModule;
+					$lsPathSrcModule = $lsPathSrc . DS . $this->_sModuleName;
 					$this->createDir($lsPathSrcModule);
 
 					if (file_exists($lsPathSrcModule))
 					{
 						$lsPathController = $lsPathSrcModule . DS . 'Controller';
 						$this->createDir($lsPathController);
-						$this->saveFile($lsPathController, 'Controller', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathController, '_Controller', $lsFileLicense);
 
 						$lsPathEntity = $lsPathSrcModule . DS . 'Entity';
 						$this->createDir($lsPathEntity);
-						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense);
+						$this->saveFile($lsPathEntity, '_Basic', $lsFileLicense);
+						$this->saveFile($lsPathEntity, '_Extended', $lsFileLicense);
+						$this->saveFile($lsPathEntity, '_Repository', $lsFileLicense);
 						
 						$lsPathForm = $lsPathSrcModule . DS . 'Form';
 						$this->createDir($lsPathForm);
-						$this->saveFile($lsPathForm, 'Form', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathForm, '_Form', $lsFileLicense);
 						
-						$lsPathGrid = $lsPathSrcModule . DS . 'Grid';
-						$this->createDir($lsPathGrid);
-						$this->saveFile($lsPathGrid, 'Grid', $lsFileLicense, $lsModule);
+						//$lsPathGrid = $lsPathSrcModule . DS . 'Grid';
+						//$this->createDir($lsPathGrid);
+						//$this->saveFile($lsPathGrid, 'Grid', $lsFileLicense);
 						
-						$this->setModuleAutoload($lsPathConfig, $lsModule, $lsClient);
+						if ($this->_sModuleName != "Backend" && $this->_sModuleName != "Frontend")
+						{
+							$this->setModuleAutoload($lsPathConfig);
+						}
 					}
 				}
 			}
+		}
+		else
+		{
+			Debug::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
 }

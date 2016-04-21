@@ -1,5 +1,5 @@
 <?php
-#%LICENSE%# 
+ 
 $lgValidate = array(
 	'client' => '^[0-9]{1,10}$',
 	'status' => '^[0-9]{1}$',

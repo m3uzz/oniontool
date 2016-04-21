@@ -1,0 +1,7 @@
+<?php
+#%LICENSE%#
+$this->headTitle($lsTitleP . $lsFolder);
+echo '<h1>' . $this->escapeHtml($lsTitleP . $lsFolder) . '</h1>';
+
+echo $lsGrid;
+	

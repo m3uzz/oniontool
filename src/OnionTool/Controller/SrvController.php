@@ -58,6 +58,9 @@ class SrvController extends ToolAbstract
 	public function init ()
 	{
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'srv';
+		
+		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequest('module'));
 	}
 
 
@@ -75,25 +78,22 @@ class SrvController extends ToolAbstract
 	 */
 	public function newClientAction ()
 	{
-		$lsClient = $this->getRequest('client', "onionapp.com");
-		$lsModule = $this->getRequest('module');
-		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
+		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
 		$this->createDir($lsPathClient);
 		
 		if (file_exists($lsPathClient))
 		{
-			$lsFileLicense = $this->getLicense($lsClient);
+			$lsFileLicense = $this->getLicense($this->_sClientFolder);
 			
 			$this->saveFile($lsPathClient, 'onionsrv', $lsFileLicense);
 			
 			$lsPathConfig = $lsPathClient . DS . 'config';			
 			$this->createDir($lsPathConfig);
-			$this->saveFile($lsPathConfig, 'srv-config', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'srv-module', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'srv-service', $lsFileLicense);
-			$this->saveFile($lsPathConfig, 'srv-validate', $lsFileLicense);
+			$this->saveFile($lsPathConfig, 'srv-config');
+			$this->saveFile($lsPathConfig, 'srv-module');
+			$this->saveFile($lsPathConfig, 'srv-service');
+			$this->saveFile($lsPathConfig, 'srv-validate');
 			
 			$lsPathData = $lsPathClient . DS . 'data';
 			$this->createDir($lsPathData, 0777);
@@ -110,7 +110,7 @@ class SrvController extends ToolAbstract
 			$lsPathPublic = $lsPathClient . DS . 'srv-public';			
 			$this->createDir($lsPathPublic);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
-			$this->saveFile($lsPathPublic, 'htaccess', $lsFileLicense);
+			$this->saveFile($lsPathPublic, 'htaccess');
 			$this->saveFile($lsPathPublic, 'robots');
 			$this->saveFile($lsPathPublic, 'sitemap');
 			
@@ -127,71 +127,78 @@ class SrvController extends ToolAbstract
 			$this->createDir($lsPathService);
 		}
 		
-		if ($lsModule == null)
+		if ($this->_sModuleName == null)
 		{
-			$this->newModuleAction();
+			$this->setModuleName("SrvApp");
 		}
+		
+		$this->newModuleAction();
 	}
 	
 	
 	/**
 	 * 
 	 */
-	public function newModuleAction ()
+	public function newServiceAction ()
 	{
-		$lsClient = $this->getRequest('client', "onionapp.com");
-		$lsModule = $this->getRequest('module', "OnionApp");
-		$lsModule = ucfirst($lsModule);
+		if ($this->_sModuleName == null)
+		{
+			Debug::exitError("The param module is required! Please, use --help for further information.");
+		}
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($lsClient);
+		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		$lsPathService = $lsPathClient . DS . 'service';
 		$lsPathConfig = $lsPathClient . DS . 'config';
 		
 		if (file_exists($lsPathService))
 		{
-			$lsPathModule = $lsPathService . DS . $lsModule;
+			$lsPathModule = $lsPathService . DS . $this->_sModuleName;
 			$this->createDir($lsPathModule);
 			
 			if (file_exists($lsPathModule))
 			{
-				$lsFileLicense = $this->getLicense($lsModule);
+				$lsFileLicense = $this->getLicense($this->_sModuleName);
 				
 				$lsPathModuleConfig = $lsPathModule . DS . 'config';
 				$this->createDir($lsPathModuleConfig);	
-				$this->saveFile($lsPathModuleConfig, 'help', $lsFileLicense, $lsModule);
+				$this->saveFile($lsPathModuleConfig, 'help');
 
 				$lsPathSrc = $lsPathModule . DS . 'src';
 				$this->createDir($lsPathSrc);
 										
 				if (file_exists($lsPathSrc))
 				{
-					$lsPathSrcModule = $lsPathSrc . DS . $lsModule;
+					$lsPathSrcModule = $lsPathSrc . DS . $this->_sModuleName;
 					$this->createDir($lsPathSrcModule);
 
 					if (file_exists($lsPathSrcModule))
 					{
 						$lsPathController = $lsPathSrcModule . DS . 'Controller';
 						$this->createDir($lsPathController);
-						$this->saveFile($lsPathController, 'Controller', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathController, '_Controller', $lsFileLicense);
 
 						$lsPathEntity = $lsPathSrcModule . DS . 'Entity';
 						$this->createDir($lsPathEntity);
-						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense);
 						
 						$lsPathRepository = $lsPathSrcModule . DS . 'Repository';
 						$this->createDir($lsPathRepository);
-						$this->saveFile($lsPathRepository, 'Repository', $lsFileLicense, $lsModule);
+						$this->saveFile($lsPathRepository, '_Repository', $lsFileLicense);
 						
 						$lsPathView = $lsPathSrcModule . DS . 'View';
 						$this->createDir($lsPathView);
 						
-						$lsPathViewController = $lsPathView . DS . $lsModule;
+						$lsPathViewController = $lsPathView . DS . $this->_sModuleName;
 						$this->createDir($lsPathViewController);
 						
-						$this->setModuleAutoload($lsPathConfig, $lsModule, $lsClient);
+						$this->setSrvModuleAutoload($lsPathConfig);
 					}
 				}
 			}
+		}
+		else 
+		{
+			Debug::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
 }

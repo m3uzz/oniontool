@@ -1,0 +1,9 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Entity;
+use Onion\ORM\EntityRepositoryORM;
+
+class #%MODULE%#Repository extends EntityRepositoryORM
+{
+}
+	
