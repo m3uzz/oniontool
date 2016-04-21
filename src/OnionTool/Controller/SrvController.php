@@ -142,7 +142,7 @@ class SrvController extends ToolAbstract
 			$this->setModuleName("SrvApp");
 		}
 		
-		$this->newModuleAction();
+		$this->newServiceAction();
 	}
 	
 	
