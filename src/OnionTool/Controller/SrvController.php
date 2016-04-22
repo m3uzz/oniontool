@@ -106,9 +106,9 @@ class SrvController extends ToolAbstract
 			$this->saveFile($lsPathConfig, 'srv-validate');
 			
 			$lsPathData = $lsPathClient . DS . 'data';
-			$this->createDir($lsPathData, 0777);
+			$this->createDir($lsPathData, true, 0777);
 			$lsPathDataLogs = $lsPathData . DS . 'logs';
-			$this->createDir($lsPathDataLogs, 0777);
+			$this->createDir($lsPathDataLogs, true, 0777);
 			
 			$lsPathLayout = $lsPathClient . DS . 'layout';
 			$this->createDir($lsPathLayout);
@@ -118,7 +118,7 @@ class SrvController extends ToolAbstract
 			$this->createDir($lsPathLayoutTemplate);
 			
 			$lsPathPublic = $lsPathClient . DS . 'srv-public';			
-			$this->createDir($lsPathPublic);
+			$this->createDir($lsPathPublic, false);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
 			$this->saveFile($lsPathPublic, 'htaccess');
 			$this->saveFile($lsPathPublic, 'robots');

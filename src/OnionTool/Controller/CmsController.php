@@ -123,15 +123,15 @@ class CmsController extends ToolAbstract
 			$this->saveFile($lsPathConfig, 'table');
 
 			$lsPathData = $lsPathClient . DS . 'data';
-			$this->createDir($lsPathData, 0777);
+			$this->createDir($lsPathData, true, 0777);
 			$lsPathDataCache = $lsPathData . DS . 'cache';
-			$this->createDir($lsPathDataCache, 0777);
+			$this->createDir($lsPathDataCache, true, 0777);
 			$lsPathDataLogs = $lsPathData . DS . 'logs';
-			$this->createDir($lsPathDataLogs, 0777);
+			$this->createDir($lsPathDataLogs, true, 0777);
 			$lsPathDataTemp = $lsPathData . DS . 'temp';
-			$this->createDir($lsPathDataTemp, 0777);
+			$this->createDir($lsPathDataTemp, true, 0777);
 			$lsPathDataUploads = $lsPathData . DS . 'uploads';
-			$this->createDir($lsPathDataUploads, 0777);
+			$this->createDir($lsPathDataUploads, true, 0777);
 				
 			$lsPathLayout = $lsPathClient . DS . 'layout';
 			$this->createDir($lsPathLayout);
@@ -141,7 +141,7 @@ class CmsController extends ToolAbstract
 			$this->createDir($lsPathLayoutTemplate);
 				
 			$lsPathPublic = $lsPathClient . DS . 'public';
-			$this->createDir($lsPathPublic);
+			$this->createDir($lsPathPublic, false);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
 			$this->saveFile($lsPathPublic, 'htaccess');
 			$this->saveFile($lsPathPublic, 'robots');

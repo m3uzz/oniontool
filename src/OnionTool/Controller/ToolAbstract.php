@@ -129,16 +129,21 @@ abstract class ToolAbstract extends AbstractController
 	/**
 	 *
 	 * @param string $psPath
+	 * @param bool $pbHtaccess
 	 * @param int $pnChmod
 	 * @param string $pnChown
 	 * @param string $pnChown
 	 */
-	public function createDir ($psPath, $pnChmod = null, $psChown = null, $psChgrp = null)
+	public function createDir ($psPath, $pbHtaccess = true, $pnChmod = null, $psChown = null, $psChgrp = null)
 	{
 		System::createDir($psPath, $pnChmod, $psChown, $psChgrp);
-		$lsFileContent = System::localRequest($this->_sModelPath . DS . "deny.model");
-		$lsFilePath = $psPath . DS . '.htaccess';
-		System::saveFile($lsFilePath, $lsFileContent);
+		
+		if ($pbHtaccess)
+		{
+			$lsFileContent = System::localRequest($this->_sModelPath . DS . "deny.model");
+			$lsFilePath = $psPath . DS . '.htaccess';
+			System::saveFile($lsFilePath, $lsFileContent);
+		}
 	}
 	
 	
