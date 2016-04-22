@@ -261,4 +261,70 @@ class CmsController extends ToolAbstract
 			Debug::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
+	
+	
+	public function getVendorLayoutAction ()
+	{
+	
+	}
+	
+
+	public function getModuleDefaultAction ()
+	{
+	
+	}
+	
+	
+	public function confAclAction ()
+	{
+	
+	}
+	
+	
+	public function confBackendAction ()
+	{
+	
+	}
+	
+	
+	public function confCacheAction ()
+	{
+	
+	}
+	
+	
+	public function confClientAction ()
+	{
+	
+	}
+	
+	
+	public function confDbAction ()
+	{
+	
+	}
+
+	
+	public function confFrontendAction ()
+	{
+	
+	}
+	
+	
+	public function confLogAction ()
+	{
+	
+	}
+	
+	
+	public function confMailAction ()
+	{
+	
+	}
+	
+	
+	public function confMenuAction ()
+	{
+	
+	}
 }

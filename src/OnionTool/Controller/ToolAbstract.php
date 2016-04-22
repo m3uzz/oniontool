@@ -47,6 +47,7 @@ use OnionSrv\Abstracts\AbstractController;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
+use OnionSrv\Help;
 use OnionLib\String;
 use OnionLib\Util;
 
@@ -313,5 +314,42 @@ abstract class ToolAbstract extends AbstractController
 			
 			System::saveFile($lsFilePath, $lsFileContent);
 		}
+	}
+	
+	
+	public function confApacheAction ()
+	{
+		$loHelp = new Help();
+		$loHelp->clear();
+		
+		$loHelp->set("        *** m3uzz OnionSrv - Version: " . $loHelp::VERSION . " ***        ", $loHelp::PURPLE, $loHelp::BGBLACK);
+		$loHelp->set("\n");
+		$loHelp->set("AUTHOR:  Humberto Lourenço <betto@m3uzz.com>             ", $loHelp::CYAN, $loHelp::BGBLACK);
+		$loHelp->set("\n");
+		$loHelp->set("LINK:    http://github.com/m3uzz/onionsrv                ", $loHelp::CYAN, $loHelp::BGBLACK);
+		$loHelp->set("\n");
+		$loHelp->set("LICENCE: http://www.opensource.org/licenses/BSD-3-Clause ", $loHelp::CYAN, $loHelp::BGBLACK);
+		$loHelp->set("\n\n");
+		
+		$loHelp->set("    **** Apache 2.2 - Config development environment ****    \n", $loHelp::BROWN, "", $loHelp::B);
+		
+		$loHelp->setTopic("STEP 1:");
+		$loHelp->setLine("Move", "Move the application to the Apache document root (Linux default is /var/www)");
+		$loHelp->setLine("ex. move", "$ sudo mv /foo/bar/application/folder /var/www/");
+		$loHelp->setLine("Simblink", "Create a simblink of the application to the Apache document root (Linux default is /var/www)");
+		$loHelp->setLine("ex. simblink", "$ sudo ln -s /foo/bar/application/folder /var/www/");
+		
+		$loHelp->setTopic("STEP 2:");
+		$loHelp->setLine("Set etc/hosts", "Set your etc/hosts to know the development host alias");
+		$loHelp->setLine("Edit hosts file", "$ sudo vi /etc/hosts");
+		$loHelp->setLine("Paste this", "127.0.1.1	local.project-name");
+		
+		$loHelp->setTopic("STEP 3:");
+		
+		$loHelp->setTopic("STEP 4:");
+		
+		$loHelp->setTopic("STEP 5:");
+		
+		$loHelp->display();
 	}
 }
