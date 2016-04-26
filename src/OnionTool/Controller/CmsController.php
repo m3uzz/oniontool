@@ -71,6 +71,41 @@ class CmsController extends ToolAbstract
 	
 	
 	/**
+	 * 
+	 */
+	public function installAction ()
+	{
+		if (System::confirm("Create onionTool link on bin folder?") == "y")
+		{
+			$this->tool2BinAction();
+		}
+
+		if ($this->checkDependenciesAction())
+		{
+			if (System::confirm("Install layout vendors?") == "y")
+			{
+				$this->layoutGitAction();
+				$this->layoutDistAction();
+			}
+			
+			if (System::confirm("Create onioncms data base?") == "y")
+			{
+				$this->installDbAction();
+			}
+			
+			if (System::confirm("Configure Apache 2 virtual host for dev environment?") == "y")
+			{
+				$this->virtualHostDevAction();
+			}
+			else 
+			{
+				$this->confApacheAction();
+			}
+		}
+	}
+	
+	
+	/**
 	 *
 	 */
 	public function tool2BinAction ()
@@ -289,7 +324,7 @@ class CmsController extends ToolAbstract
 				{
 					chdir($lsPackageDir);
 					
-					Debug::display("wget https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
+					Debug::display("Getting https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
 					System::execute("wget https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
 					
 					$lsGzFile = $lsRelease . ".tar.gz";
@@ -321,7 +356,7 @@ class CmsController extends ToolAbstract
 				
 			while (false !== ($lsResource = $loDir->read()))
 			{
-				Debug::display($lsResource);
+				Debug::debug($lsResource);
 		
 				if ($lsResource != 'dist' && $lsResource != 'lang' && $lsResource != '.' && $lsResource != '..')
 				{
@@ -365,7 +400,7 @@ class CmsController extends ToolAbstract
 					"^script",
 					"^meteor",
 					"^template",
-					"^sample*",
+					"^sample",
 					"^example",
 					"^demo",
 					"^doc",
@@ -379,13 +414,13 @@ class CmsController extends ToolAbstract
 					"\.htm$",
 					"\.sh$",
 					"gruntfile.js",
-					"^\./"
+					"^\."
 				);
 			}
 							
 			while (false !== ($lsResource = $loDir->read()))
 			{
-				Debug::display($lsResource);
+				Debug::debug($lsResource);
 					
 				if ($lsResource != 'dist' && $lsResource != 'lang' && $lsResource != '.' && $lsResource != '..')
 				{
@@ -434,7 +469,7 @@ class CmsController extends ToolAbstract
 				{
 					chdir($lsPackageDir);
 						
-					Debug::display("wget {$lsDist}");
+					Debug::display("Getting {$lsDist}");
 					System::execute("wget {$lsDist}");
 
 					$laDist = parse_url($lsDist);
@@ -461,7 +496,16 @@ class CmsController extends ToolAbstract
 		}
 	}
 	
+	
 
+	
+	
+	public function installDbAction ()
+	{
+		
+	}
+	
+	
 	public function getModuleDefaultAction ()
 	{
 	

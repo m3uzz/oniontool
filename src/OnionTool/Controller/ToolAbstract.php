@@ -377,47 +377,55 @@ abstract class ToolAbstract extends AbstractController
 	{
 		if ($_SERVER["USER"] == "root")
 		{
-			$lsClientFolder = $this->getRequestArg('folder', null, false);
-			$lsDomain = $this->getRequestArg('domain', null, false);
-			$lsPort = $this->getRequestArg('port', '80', false);
-			$lsDocRoot = $this->getRequestArg('docroot', DS . "var" . DS . "www" . DS, false);
-			$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", false);
-			$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", false);
-			$lsApacheDir = $this->getRequestArg('apachedir', DS . "etc" . DS . "apache2" . DS);
 			$lsApacheGroup = $this->getRequestArg('apachegrp', "www-data");
 
 			Debug::display("CHGPR project folder");
 			$laReturn = System::execute("chgrp {$lsApacheGroup} " . BASE_DIR . " -R");
-			Debug::display($laReturn);
+			Debug::debug($laReturn);
 				
+			$lsDocRoot = $this->getRequestArg('docroot', DS . "var" . DS . "www" . DS, false);
+			
 			Debug::display("Create project link to document root: " . BASE_DIR . "  to {$lsDocRoot}");
 			System::simblink(BASE_DIR, $lsDocRoot);
 	
-			Debug::display("Backuping {$lsHosts} to {$lsHosts}.bkp");
-			$laReturn = System::execute("cp {$lsHosts} {$lsHosts}.bkp");
-			Debug::display($laReturn);
-			Debug::display("Seting '{$lsLocalhost}\t{$lsDomain}' to {$lsHosts}");
-			$laReturn = System::execute("echo {$lsLocalhost}\t{$lsDomain} >> {$lsHosts}");
-			Debug::display($laReturn);
+			if (System::confirm("Create Apache virtual host?") == "y")
+			{
+				$lsClientFolder = $this->getRequestArg('folder', null, false);
+				$lsDomain = $this->getRequestArg('domain', null, false);
+				$lsPort = $this->getRequestArg('port', '80', false);
+				$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", false);
+				$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", false);
+				$lsApacheDir = $this->getRequestArg('apachedir', DS . "etc" . DS . "apache2" . DS);
+				
+				Debug::display("Backuping {$lsHosts} to {$lsHosts}.bkp");
+				$laReturn = System::execute("cp {$lsHosts} {$lsHosts}.bkp");
+				Debug::debug($laReturn);
+				Debug::display("Seting '{$lsLocalhost}\t{$lsDomain}' to {$lsHosts}");
+				$laReturn = System::execute("echo {$lsLocalhost}\t{$lsDomain} >> {$lsHosts}");
+				Debug::debug($laReturn);
+				
+				$laAppDirName = explode(DS, BASE_DIR);
+				$lsAppDirName = array_pop($laAppDirName);
+				$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . 'public';
+				$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
+				
+				Debug::display("Creating vhost: " . $lsSitesAvailablePath);
+				$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain, $lsPort);
+				Debug::debug($lsVirtualHost);
+				$laReturn = System::saveFile($lsSitesAvailablePath, trim($lsVirtualHost));
+				Debug::debug($laReturn);
+				
+				Debug::display("Enable vhost {$lsDomain}");
+				$laReturn = System::execute("a2ensite {$lsDomain}");
+				Debug::debug($laReturn);
 			
-			$laAppDirName = explode(DS, BASE_DIR);
-			$lsAppDirName = array_pop($laAppDirName);
-			$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . 'public';
-			$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
-			
-			Debug::display("Creating vhost: " . $lsSitesAvailablePath);
-			$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain, $lsPort);
-			Debug::display($lsVirtualHost);
-			$laReturn = System::saveFile($lsSitesAvailablePath, trim($lsVirtualHost));
-			Debug::display($laReturn);
-			
-			Debug::display("Enable vhost {$lsDomain}");
-			$laReturn = System::execute("a2ensite {$lsDomain}");
-			Debug::display($laReturn);
-			
-			Debug::display("Apache reload");
-			$laReturn = System::execute(DS . "etc" . DS . "init.d" . DS . "apache2 reload");
-			Debug::display($laReturn);
+				if (System::confirm("Reload Apache2?") == "y")
+				{
+					Debug::display("Apache reload");
+					$laReturn = System::execute(DS . "etc" . DS . "init.d" . DS . "apache2 reload");
+					Debug::debug($laReturn);
+				}
+			}
 		}
 		else
 		{
@@ -474,5 +482,14 @@ abstract class ToolAbstract extends AbstractController
 		';
 		
 		return $lsVirtualHost;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function checkDependenciesAction ()
+	{
+		return true;
 	}
 }
