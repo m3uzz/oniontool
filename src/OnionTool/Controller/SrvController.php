@@ -85,8 +85,8 @@ class SrvController extends ToolAbstract
 	 */
 	public function newClientAction ()
 	{
-		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequest('module'));
+		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequestArg('module'));
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
@@ -151,8 +151,8 @@ class SrvController extends ToolAbstract
 	 */
 	public function newServiceAction ()
 	{
-		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequest('module'));
+		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequestArg('module', null, false));
 		
 		if ($this->_sModuleName == null)
 		{

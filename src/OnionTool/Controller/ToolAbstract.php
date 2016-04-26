@@ -56,6 +56,8 @@ abstract class ToolAbstract extends AbstractController
 
 	protected $_sModelPath;
 	
+	protected $_sLayoutVendor;
+	
 	protected $_sClientFolder;
 	
 	protected $_sClientName;
@@ -251,10 +253,10 @@ abstract class ToolAbstract extends AbstractController
 	 */
 	public function getLicense ($psPackage)
 	{
-		$lsAuthor = $this->getRequest('author', "Humberto Lourenço");
-		$lsEmail = $this->getRequest('email', "betto@m3uzz.com");
-		$lsLink = $this->getRequest('link', "http://github.com/m3uzz/onionsrv");
-		$lsCopyrightIni = $this->getRequest('cinit', "2014");
+		$lsAuthor = $this->getRequestArg('author', "Humberto Lourenço");
+		$lsEmail = $this->getRequestArg('email', "betto@m3uzz.com");
+		$lsLink = $this->getRequestArg('link', "http://github.com/m3uzz/onionsrv");
+		$lsCopyrightIni = $this->getRequestArg('cinit', "2014");
 		
 		$lsLicensePath = $this->_sModelPath . DS . 'LICENSE.model';
 		$lsFileLicense = System::localRequest($lsLicensePath);
@@ -317,8 +319,16 @@ abstract class ToolAbstract extends AbstractController
 	}
 	
 	
+	/**
+	 * 
+	 */
 	public function confApacheAction ()
 	{
+		$lsDomain = "local.project-name";
+		$lsDocumentRoot = "/var/www/path/to/the/client/public";
+		$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain);
+		$lsAppFolder = "/foo/bar/application/folder";
+		
 		$loHelp = new Help();
 		$loHelp->clear();
 		
@@ -334,22 +344,135 @@ abstract class ToolAbstract extends AbstractController
 		$loHelp->set("    **** Apache 2.2 - Config development environment ****    \n", $loHelp::BROWN, "", $loHelp::B);
 		
 		$loHelp->setTopic("STEP 1:");
-		$loHelp->setLine("Move", "Move the application to the Apache document root (Linux default is /var/www)");
-		$loHelp->setLine("ex. move", "$ sudo mv /foo/bar/application/folder /var/www/");
-		$loHelp->setLine("Simblink", "Create a simblink of the application to the Apache document root (Linux default is /var/www)");
-		$loHelp->setLine("ex. simblink", "$ sudo ln -s /foo/bar/application/folder /var/www/");
+		$loHelp->setLine("DocumentRoot", "Move or create a link of the application to the Apache document root (Linux default is /var/www)");
+		$loHelp->setLine("Moving", "$ sudo mv {$lsAppFolder} /var/www/");
+		$loHelp->setLine("Or");
+		$loHelp->setLine("Simblink", "$ sudo ln -s {$lsAppFolder} /var/www/");
 		
 		$loHelp->setTopic("STEP 2:");
-		$loHelp->setLine("Set etc/hosts", "Set your etc/hosts to know the development host alias");
-		$loHelp->setLine("Edit hosts file", "$ sudo vi /etc/hosts");
-		$loHelp->setLine("Paste this", "127.0.1.1	local.project-name");
+		$loHelp->setLine("CHMOD project", "$ sudo chmod 755 {$lsAppFolder} -R");
+		$loHelp->setLine("CHGPR project", "$ sudo chgrp www-data {$lsAppFolder} -R");
 		
 		$loHelp->setTopic("STEP 3:");
+		$loHelp->setLine("Set hosts file", "$ sudo echo 127.0.0.1	{$lsDomain} >> /etc/hosts");
 		
 		$loHelp->setTopic("STEP 4:");
+		$loHelp->setLine("Edit a new vhost", "$ sudo vi /etc/apache2/sites-available/{$lsDomain}.conf");
+		$loHelp->setLine("Copy, paste & edit", $lsVirtualHost);
 		
 		$loHelp->setTopic("STEP 5:");
+		$loHelp->setLine("Active in sites-enable", '$ sudo a2ensite {$lsDomain}');
+		
+		$loHelp->setTopic("STEP 6:");
+		$loHelp->setLine("Reload Apache2", "$ sudo /etc/init.d/apache2 reload");
 		
 		$loHelp->display();
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function virtualHostDevAction ()
+	{
+		if ($_SERVER["USER"] == "root")
+		{
+			$lsClientFolder = $this->getRequestArg('folder', null, false);
+			$lsDomain = $this->getRequestArg('domain', null, false);
+			$lsPort = $this->getRequestArg('port', '80', false);
+			$lsDocRoot = $this->getRequestArg('docroot', DS . "var" . DS . "www" . DS, false);
+			$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", false);
+			$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", false);
+			$lsApacheDir = $this->getRequestArg('apachedir', DS . "etc" . DS . "apache2" . DS);
+			$lsApacheGroup = $this->getRequestArg('apachegrp', "www-data");
+
+			Debug::display("CHGPR project folder");
+			$laReturn = System::execute("chgrp {$lsApacheGroup} " . BASE_DIR . " -R");
+			Debug::display($laReturn);
+				
+			Debug::display("Create project link to document root: " . BASE_DIR . "  to {$lsDocRoot}");
+			System::simblink(BASE_DIR, $lsDocRoot);
+	
+			Debug::display("Backuping {$lsHosts} to {$lsHosts}.bkp");
+			$laReturn = System::execute("cp {$lsHosts} {$lsHosts}.bkp");
+			Debug::display($laReturn);
+			Debug::display("Seting '{$lsLocalhost}\t{$lsDomain}' to {$lsHosts}");
+			$laReturn = System::execute("echo {$lsLocalhost}\t{$lsDomain} >> {$lsHosts}");
+			Debug::display($laReturn);
+			
+			$laAppDirName = explode(DS, BASE_DIR);
+			$lsAppDirName = array_pop($laAppDirName);
+			$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . 'public';
+			$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
+			
+			Debug::display("Creating vhost: " . $lsSitesAvailablePath);
+			$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain, $lsPort);
+			Debug::display($lsVirtualHost);
+			$laReturn = System::saveFile($lsSitesAvailablePath, trim($lsVirtualHost));
+			Debug::display($laReturn);
+			
+			Debug::display("Enable vhost {$lsDomain}");
+			$laReturn = System::execute("a2ensite {$lsDomain}");
+			Debug::display($laReturn);
+			
+			Debug::display("Apache reload");
+			$laReturn = System::execute(DS . "etc" . DS . "init.d" . DS . "apache2 reload");
+			Debug::display($laReturn);
+		}
+		else
+		{
+			Debug::exitError("You need root access to run this action! Please try run this action using sudo.");
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psDocRoot
+	 * @param string $psDomain
+	 * @param string $psPort
+	 * @return string
+	 */
+	public function apacheConf ($psDocRoot, $psDomain, $psPort = "80")
+	{
+		$lsVirtualHost = '
+		<VirtualHost *:' . $psPort . '>
+			ServerName ' . $psDomain . '
+			ServerAdmin webmaster@localhost
+			SetEnv APPLICATION_ENV "development"
+			#SetEnv APPLICATION_ENV "production"
+					
+			DocumentRoot ' . $psDocRoot . '
+					
+			#<Directory />
+			#	Options FollowSymLinks
+			#	AllowOverride None
+			#</Directory>
+			#<Directory ' . $psDocRoot . '/>
+			#	Options Indexes FollowSymLinks MultiViews
+			#	AllowOverride All
+			#	Order allow,deny
+			#	allow from all
+			#</Directory>
+			
+			#ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+			#<Directory "/usr/lib/cgi-bin">
+			#	AllowOverride None
+			#	Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+			#	Order allow,deny
+			#	Allow from all
+			#</Directory>
+			
+			ErrorLog ${APACHE_LOG_DIR}/error.log
+			
+			# Possible values include: debug, info, notice, warn, error, crit,
+			# alert, emerg.
+			LogLevel warn
+			
+			CustomLog ${APACHE_LOG_DIR}/access.log combined
+		</VirtualHost>
+		';
+		
+		return $lsVirtualHost;
 	}
 }

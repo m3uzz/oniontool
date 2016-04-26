@@ -51,6 +51,12 @@ $lgValidate = array(
 	'email' => '',
 	'link' => '',
 	'cinit' => '',
+	'docroot' => '^\/[a-zA-Z0-9\.-]+\/$',
+	'hosts' => '^\/[a-zA-Z0-9\.-]+$',
+	'localhost' => '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$',
+	'apachedir' => '^\/[a-zA-Z0-9\.-]+\/$',
+	'apachegrp' => '',
+	'port' => '^[0-9]{2,6}$',
 );
 
 return array(

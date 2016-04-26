@@ -57,9 +57,7 @@ class CmsController extends ToolAbstract
 	public function init ()
 	{
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'cms';
-		
-		$this->setClientFolder($this->getRequest('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequest('module'));
+		$this->_sLayoutVendor = BASE_DIR . DS . 'layout' . DS . 'vendor';
 	}
 
 
@@ -91,8 +89,9 @@ class CmsController extends ToolAbstract
 	 */
 	public function newClientAction ()
 	{
-		$this->setClientDomain($this->getRequest('domain'));
-		$this->setClientName($this->getRequest('client'));
+		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
+		$this->setClientDomain($this->getRequestArg('domain', "local.onionapp.com"));
+		$this->setClientName($this->getRequestArg('client', "OnionApp"));
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
@@ -166,7 +165,7 @@ class CmsController extends ToolAbstract
 		$this->setModuleName("Frontend");
 		$this->newModuleAction();
 		
-		$this->setModuleName($this->getRequest('module'));
+		$this->setModuleName($this->getRequestArg('module'));
 		
 		if ($this->_sModuleName != null)
 		{
@@ -180,6 +179,9 @@ class CmsController extends ToolAbstract
 	 */
 	public function newModuleAction ()
 	{
+		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
+		$this->setModuleName($this->getRequestArg('module'), null, false);
+		
 		if ($this->_sModuleName == null)
 		{
 			Debug::exitError("The param module is required! Please, use --help for further information.");
@@ -263,9 +265,200 @@ class CmsController extends ToolAbstract
 	}
 	
 	
-	public function getVendorLayoutAction ()
+	/**
+	 * 
+	 */
+	public function layoutGitAction ()
 	{
+		$lsDependency = System::localRequest(BASE_DIR . DS . "layout" . DS . "layout.json");
+		$laDependency = json_decode($lsDependency, true);
+		Debug::debug($laDependency);
+		
+		if (isset($laDependency['require']) && is_array($laDependency['require']))
+		{
+			System::createDir($this->_sLayoutVendor);
+			
+			foreach ($laDependency['require'] as $lsPackage => $lsRelease)
+			{
+				$laPackage = explode("/", $lsPackage);
+				$lsPackageDir = $this->_sLayoutVendor . DS . $laPackage[0];
+				$lsPackageReleaseDir = $lsPackageDir . DS . $laPackage[1] . "-" . preg_replace("/[^0-9\.]/", "", $lsRelease);
+				System::createDir($lsPackageDir);
+				
+				if (is_dir($lsPackageDir) && !is_dir($lsPackageReleaseDir))
+				{
+					chdir($lsPackageDir);
+					
+					Debug::display("wget https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
+					System::execute("wget https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
+					
+					$lsGzFile = $lsRelease . ".tar.gz";
+					$lsGzFilePath = $lsPackageDir . DS . $lsGzFile;
+					
+					if (is_file($lsGzFilePath))
+					{
+						System::execute("tar -xzf {$lsGzFile}");
+						System::removeFile($lsGzFile);
+
+						$this->clearDir ($lsPackageReleaseDir);
+					}
+				}
+			}
+		}
+	}
 	
+	
+	/**
+	 * 
+	 */
+	public function clearDir ($psPackageReleaseDir)
+	{
+		chdir($psPackageReleaseDir);
+		
+		if (is_dir($psPackageReleaseDir . DS . "dist"))
+		{
+			$loDir = dir($psPackageReleaseDir);
+				
+			while (false !== ($lsResource = $loDir->read()))
+			{
+				Debug::display($lsResource);
+		
+				if ($lsResource != 'dist' && $lsResource != 'lang' && $lsResource != '.' && $lsResource != '..')
+				{
+					if (is_dir($loDir->path . DS . $lsResource))
+					{
+						System::removeDir($loDir->path . DS . $lsResource);
+					}
+					else
+					{
+						System::removeFile($loDir->path . DS . $lsResource);
+					}
+				}
+			}
+				
+			$loDir->close();
+		}
+		else
+		{
+			$loDir = dir($psPackageReleaseDir);
+		
+			$lsDependency = System::localRequest(BASE_DIR . DS . "layout" . DS . "layout.json");
+			$laDependency = json_decode($lsDependency, true);
+			Debug::debug($laDependency);
+			
+			if (isset($laDependency['ignore']))
+			{
+				$laPatern = $laDependency['ignore'];
+			}
+			else 
+			{	
+				$laPatern = array(
+					"^dev",
+					"^src",
+					"^build",
+					"^external",
+					"^test",
+					"^log",
+					"^error",
+					"^task",
+					"^extra",
+					"^script",
+					"^meteor",
+					"^template",
+					"^sample*",
+					"^example",
+					"^demo",
+					"^doc",
+					"\.json$",
+					"\.md$",
+					"\.txt$",
+					"\.rb$",
+					"\.yml$",
+					"\.xml$",
+					"\.html$",
+					"\.htm$",
+					"\.sh$",
+					"gruntfile.js",
+					"^\./"
+				);
+			}
+							
+			while (false !== ($lsResource = $loDir->read()))
+			{
+				Debug::display($lsResource);
+					
+				if ($lsResource != 'dist' && $lsResource != 'lang' && $lsResource != '.' && $lsResource != '..')
+				{
+					foreach ($laPatern as $lsPatern)
+					{
+						if (preg_match("/$lsPatern/i", $lsResource))
+						{
+							if (is_dir($loDir->path . DS . $lsResource))
+							{
+								System::removeDir($loDir->path . DS . $lsResource);
+							}
+							else
+							{
+								System::removeFile($loDir->path . DS . $lsResource);
+							}
+						}
+					}
+				}
+			}
+		
+			$loDir->close();
+		}		
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function layoutDistAction ()
+	{
+		$lsDependency = System::localRequest(BASE_DIR . DS . "layout" . DS . "layout.json");
+		$laDependency = json_decode($lsDependency, true);
+		Debug::debug($laDependency);
+	
+		if (isset($laDependency['dist']) && is_array($laDependency['dist']))
+		{
+			System::createDir($this->_sLayoutVendor);
+				
+			foreach ($laDependency['dist'] as $lsPackage => $lsDist)
+			{
+				$laPackage = explode("/", $lsPackage);
+				$lsPackageDir = $this->_sLayoutVendor . DS . $laPackage[0];
+				System::createDir($lsPackageDir);
+	
+				if (is_dir($lsPackageDir))
+				{
+					chdir($lsPackageDir);
+						
+					Debug::display("wget {$lsDist}");
+					System::execute("wget {$lsDist}");
+
+					$laDist = parse_url($lsDist);
+					$laPath = explode("/", $laDist['path']);
+						
+					$lsGzFile = $laPath[count($laPath) - 1];
+					$lsGzFilePath = $lsPackageDir . DS . $lsGzFile;
+						
+					if (is_file($lsGzFilePath))
+					{
+						if (preg_match("/.zip$/", $lsGzFile))
+						{
+							System::execute("unzip {$lsGzFile}");
+						}
+						elseif (preg_match("/.tar.gz$/", $lsGzFile))
+						{
+							System::execute("tar -xzf {$lsGzFile}");
+						}
+						
+						System::removeFile($lsGzFile);
+					}
+				}
+			}
+		}
 	}
 	
 

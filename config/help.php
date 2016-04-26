@@ -57,7 +57,7 @@ return array(
 				),
 			),
 			"newService" => array(
-				"desc" => "Create a new module for a existent client",
+				"desc" => "Create a new service for a existent client",
 				"params" => array(
 					"folder" => "Client folder name, eg.: onionapp.com [required]",
 					"module" => "Module name, eg.: OnionApp [required]",
@@ -65,6 +65,24 @@ return array(
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",
+				),
+			),
+			"virtualHostDev" => array(
+				"desc" => "Configure Apache2 virutal hosts for the dev environment",
+				"params" => array(
+					"folder" => "Client folder name [required]",
+					"domain" => "Domain for the virtual host access [required]",
+					"port" => "Apache port to access virtual host. Default [80]",
+					"docroot" => "Apache document root folder. Default [/var/www/]",
+					"hosts" => "Hosts file path. Default [/etc/hosts]",
+					"localhost" => "Localhost IP address. Default [127.0.0.1]",
+					"apachedir" => "Apache config path. Default [/etc/apache2/]",
+					"apachegrp" => "Apache group access. Default [www-data]",
+				),
+			),
+			"confApache" => array(
+				"desc" => "Information to set Apache2 and configure the virtual host",
+				"params" => array(
 				),
 			),
 		),
@@ -91,6 +109,34 @@ return array(
 					"email" => "Author e-mail [optional]",
 					"link" => "Project link or repository [optional]",
 					"cinit" => "Copyrigth year [optional]",
+				),
+			),
+			"layoutDist" => array(
+				"desc" => "Install layout vendors scripts from distribution link",
+				"params" => array(
+				),
+			),
+			"layoutGit" => array(
+				"desc" => "Install layout vendors scripts from github",
+				"params" => array(
+				),
+			),
+			"virtualHostDev" => array(
+				"desc" => "Configure Apache2 virutal hosts for the dev environment",
+				"params" => array(
+					"folder" => "Client folder name [required]",
+					"domain" => "Domain for the virtual host access [required]",
+					"port" => "Apache port to access virtual host. Default [80]",
+					"docroot" => "Apache document root folder. Default [/var/www/]",
+					"hosts" => "Hosts file path. Default [/etc/hosts]",
+					"localhost" => "Localhost IP address. Default [127.0.0.1]",
+					"apachedir" => "Apache config path. Default [/etc/apache2/]",
+					"apachegrp" => "Apache group access. Default [www-data]",
+				),
+			),
+			"confApache" => array(
+				"desc" => "Information to set Apache2 and configure the virtual host",
+				"params" => array(
 				),
 			),
 		),
