@@ -152,11 +152,12 @@ class SrvController extends ToolAbstract
 	public function newServiceAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module', null, false));
+		$this->setModuleName($this->getRequestArg('module', null, true));
 		
 		if ($this->_sModuleName == null)
 		{
-			Debug::exitError("The param module is required! Please, use --help for further information.");
+			System::echoError("The param module is required! Please, use --help for further information.");
+			return;
 		}
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);

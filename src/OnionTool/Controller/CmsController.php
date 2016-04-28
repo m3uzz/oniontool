@@ -43,6 +43,7 @@
  */
 
 namespace OnionTool\Controller;
+use OnionTool\Repository\InstallRepository;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
@@ -57,6 +58,7 @@ class CmsController extends ToolAbstract
 	public function init ()
 	{
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'cms';
+		$this->_sDbPath = dirname($this->_sControllerPath) . DS . 'Db';
 		$this->_sLayoutVendor = BASE_DIR . DS . 'layout' . DS . 'vendor';
 	}
 
@@ -73,34 +75,25 @@ class CmsController extends ToolAbstract
 	/**
 	 * 
 	 */
-	public function installAction ()
+	public function prepareAction ()
 	{
-		if (System::confirm("Create onionTool link on bin folder?") == "y")
+		if (System::confirm("Create onionTool link on bin folder?"))
 		{
 			$this->tool2BinAction();
 		}
 
-		if ($this->checkDependenciesAction())
+		if ($this->checkEnvAction())
 		{
-			if (System::confirm("Install layout vendors?") == "y")
+			if (System::confirm("Install layout dependencies?"))
 			{
 				$this->layoutGitAction();
 				$this->layoutDistAction();
 			}
-			
-			if (System::confirm("Create onioncms data base?") == "y")
-			{
-				$this->installDbAction();
-			}
-			
-			if (System::confirm("Configure Apache 2 virtual host for dev environment?") == "y")
-			{
-				$this->virtualHostDevAction();
-			}
-			else 
-			{
-				$this->confApacheAction();
-			}
+		}
+		
+		if (System::confirm("Show Onion Tool help?"))
+		{
+			$this->help(true, true);
 		}
 	}
 	
@@ -125,7 +118,7 @@ class CmsController extends ToolAbstract
 	public function newClientAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setClientDomain($this->getRequestArg('domain', "local.onionapp.com"));
+		$this->setClientDomain($this->getRequestArg('domain', "local.{$this->_sClientFolder}"));
 		$this->setClientName($this->getRequestArg('client', "OnionApp"));
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
@@ -206,6 +199,22 @@ class CmsController extends ToolAbstract
 		{
 			$this->newModuleAction();
 		}
+		
+		if (System::confirm("Configure onioncms database?"))
+		{
+			$this->_sAction = "installDb";
+			$this->installDbAction();
+		}
+		
+		if (System::confirm("Configure Apache 2 virtual host for dev environment? (You need to have root access!)"))
+		{
+			$this->_sAction = "virtualHostDev";
+			$this->virtualHostDevAction();
+		}
+		else
+		{
+			$this->showVHostConfAction();
+		}
 	}
 	
 	
@@ -215,11 +224,12 @@ class CmsController extends ToolAbstract
 	public function newModuleAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module'), null, false);
+		$this->setModuleName($this->getRequestArg('module'), null, true);
 		
 		if ($this->_sModuleName == null)
 		{
-			Debug::exitError("The param module is required! Please, use --help for further information.");
+			System::echoError("The param module is required! Please, use --help for further information.");
+			return;
 		}
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
@@ -295,7 +305,7 @@ class CmsController extends ToolAbstract
 		}
 		else
 		{
-			Debug::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
+			System::echoError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
 	
@@ -324,7 +334,7 @@ class CmsController extends ToolAbstract
 				{
 					chdir($lsPackageDir);
 					
-					Debug::display("Getting https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
+					echo("Getting https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz\n");
 					System::execute("wget https://github.com/{$lsPackage}/archive/{$lsRelease}.tar.gz");
 					
 					$lsGzFile = $lsRelease . ".tar.gz";
@@ -469,7 +479,7 @@ class CmsController extends ToolAbstract
 				{
 					chdir($lsPackageDir);
 						
-					Debug::display("Getting {$lsDist}");
+					echo("Getting {$lsDist}\n");
 					System::execute("wget {$lsDist}");
 
 					$laDist = parse_url($lsDist);
@@ -497,12 +507,155 @@ class CmsController extends ToolAbstract
 	}
 	
 	
-
-	
-	
+	/**
+	 *
+	 */
 	public function installDbAction ()
 	{
+		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		
+		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
+		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
+		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['production']['password']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
+		
+		$laDbConf = array(
+			'host' => $lsDbHost,
+			'port' => $lsDbPort,
+			'user' => $lsDbUser,
+			'pass' => $lsDbPass,
+		);
+		
+		$this->_aRepository['newDb'] = new InstallRepository($laDbConf);
+		
+		if ($this->_aRepository['newDb']->connect())
+		{
+			if (!$this->_aRepository['newDb']->checkDb($lsDbName))
+			{
+				if (System::confirm("The database [{$lsDbName}] does not exists! Create a new database useing dbname [{$lsDbName}]?"))
+				{
+					if ($this->_aRepository['newDb']->createDb($lsDbName))
+					{
+						$laDbConf['db'] = $lsDbName;
+					}
+					else
+					{
+						System::echoError($this->_aRepository['newDb']->getErrorMsg());
+						return;
+					}
+				}
+				else 
+				{
+					System::echoWarning("You need a database to continue. Aborting proccess!");
+					return;
+				}
+			}
+			elseif (System::confirm("The database [{$lsDbName}] already exists! Confirm use this database?"))
+			{
+				$laDbConf['db'] = $lsDbName;
+			}
+			else
+			{
+				System::echoWarning("You need a database to continue. Aborting proccess!");
+				return;
+			}
+		}
+		else 
+		{
+			System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			return;
+		}
+		
+		echo("Select a database type:\n");
+		echo("[1] onion-base (default)\n");
+		echo("[2] onion-full\n");
+		echo("[3] onion-parking\n");
+		echo("[4] onion-service\n");
+		echo("[5] onion-telmsg\n");
+		
+		$lsAnswer = System::prompt("Option:");
+		
+		switch ($lsAnswer)
+		{
+			case "2":
+				$lsDbFile = "onion-full.sql";
+				break;
+			case "3":
+				$lsDbFile = "onion-parking.sql";
+				break;
+			case "4":
+				$lsDbFile = "onion-service.sql";
+				break;
+			case "5":
+				$lsDbFile = "onion-telmsg.sql";
+				break;
+			default:
+				$lsDbFile = "onion-base.sql";
+		}
+		
+		$lsDbBase = System::localRequest($this->_sDbPath . DS . $lsDbFile);
+		
+		$this->_aRepository['newDb']->setDbConf($laDbConf);
+		
+		if (!$this->_aRepository['newDb']->importDb($lsDbBase))
+		{
+			System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		}
+		else
+		{
+			System::echoSuccess("Success in configure database!");				
+		}	
+		
+		$this->confDbAction($laDbConf);
+	}
+
+	
+	/**
+	 * 
+	 */
+	public function confDbAction (array $paDbConf = null)
+	{
+		$this->setClientFolder($this->getRequestArg('folder', null, true));
+		
+		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
+
+		if ($paDbConf == null)
+		{
+			$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
+			$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
+			$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
+			$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['production']['password']);
+			$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
+			
+			$paDbConf = array(
+				'host' => $lsDbHost,
+				'port' => $lsDbPort,
+				'user' => $lsDbUser,
+				'pass' => $lsDbPass,
+				'db' => $lsDbName
+			);
+		}
+				
+		$laDbClientConf['production']['hostname'] = $paDbConf['host'];
+		$laDbClientConf['production']['port'] = $paDbConf['port'];
+		$laDbClientConf['production']['username'] = $paDbConf['user'];
+		$laDbClientConf['production']['password'] = $paDbConf['pass'];
+		$laDbClientConf['production']['database'] = $paDbConf['db'];
+		
+		$laDbClientConf['development']['hostname'] = $paDbConf['host'];
+		$laDbClientConf['development']['port'] = $paDbConf['port'];
+		$laDbClientConf['development']['username'] = $paDbConf['user'];
+		$laDbClientConf['development']['password'] = $paDbConf['pass'];
+		$laDbClientConf['development']['database'] = $paDbConf['db'];
+		
+		$lsFileContent = System::arrayToFile($laDbClientConf);
+		
+		System::saveFile($lsDbPath, $lsFileContent);
 	}
 	
 	
@@ -534,13 +687,6 @@ class CmsController extends ToolAbstract
 	{
 	
 	}
-	
-	
-	public function confDbAction ()
-	{
-	
-	}
-
 	
 	public function confFrontendAction ()
 	{

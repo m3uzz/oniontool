@@ -56,6 +56,8 @@ abstract class ToolAbstract extends AbstractController
 
 	protected $_sModelPath;
 	
+	protected $_sDbPath;
+	
 	protected $_sLayoutVendor;
 	
 	protected $_sClientFolder;
@@ -255,7 +257,7 @@ abstract class ToolAbstract extends AbstractController
 	{
 		$lsAuthor = $this->getRequestArg('author', "Humberto Lourenço");
 		$lsEmail = $this->getRequestArg('email', "betto@m3uzz.com");
-		$lsLink = $this->getRequestArg('link', "http://github.com/m3uzz/onionsrv");
+		$lsLink = $this->getRequestArg('link', "http://m3uzz.com");
 		$lsCopyrightIni = $this->getRequestArg('cinit', "2014");
 		
 		$lsLicensePath = $this->_sModelPath . DS . 'LICENSE.model';
@@ -322,7 +324,7 @@ abstract class ToolAbstract extends AbstractController
 	/**
 	 * 
 	 */
-	public function confApacheAction ()
+	public function showVHostConfAction ()
 	{
 		$lsDomain = "local.project-name";
 		$lsDocumentRoot = "/var/www/path/to/the/client/public";
@@ -377,51 +379,79 @@ abstract class ToolAbstract extends AbstractController
 	{
 		if ($_SERVER["USER"] == "root")
 		{
-			$lsApacheGroup = $this->getRequestArg('apachegrp', "www-data");
+			$laApacheConf = $this->getApacheConf();
+			
+			if (is_array($laApacheConf))
+			{
+				$lsApacheGrp = $laApacheConf['Group'];
+				$lsDocRoot = $laApacheConf['DocumentRoot'] . DS;
+				$lsServerRoot = $laApacheConf['ServerRoot'] . DS;
+			}
+			else 
+			{
+				$lsApacheGrp = "www-data";
+				$lsDocRoot = DS . "var" . DS . "www" . DS;
+				$lsServerRoot = DS . "etc" . DS . "apache2" . DS;
+			}
+			
+			$lsApacheGroup = $this->getRequestArg('apachegrp', $lsApacheGrp);
 
-			Debug::display("CHGPR project folder");
+			echo("CHGPR project folder\n");
 			$laReturn = System::execute("chgrp {$lsApacheGroup} " . BASE_DIR . " -R");
 			Debug::debug($laReturn);
 				
-			$lsDocRoot = $this->getRequestArg('docroot', DS . "var" . DS . "www" . DS, false);
+			$lsDocRoot = $this->getRequestArg('docroot', $lsDocRoot, true);
+			$laAppDirName = explode(DS, BASE_DIR);
+			$lsAppDirName = array_pop($laAppDirName);
 			
-			Debug::display("Create project link to document root: " . BASE_DIR . "  to {$lsDocRoot}");
-			System::simblink(BASE_DIR, $lsDocRoot);
-	
-			if (System::confirm("Create Apache virtual host?") == "y")
+			if (!file_exists($lsDocRoot . DS . $lsAppDirName) || System::confirm("The link {$lsDocRoot}" . DS . "{$lsAppDirName} already exists! Overwrite?"))
 			{
-				$lsClientFolder = $this->getRequestArg('folder', null, false);
-				$lsDomain = $this->getRequestArg('domain', null, false);
-				$lsPort = $this->getRequestArg('port', '80', false);
-				$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", false);
-				$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", false);
-				$lsApacheDir = $this->getRequestArg('apachedir', DS . "etc" . DS . "apache2" . DS);
+				echo("Create project link to document root: " . BASE_DIR . "  to {$lsDocRoot}\n");
+				System::simblink(BASE_DIR, $lsDocRoot);
+			}
+			
+			if (System::confirm("Create Apache virtual host?"))
+			{
+				$lsClientFolder = $this->getRequestArg('folder', $this->_sClientFolder, true);
+				$lsDomain = $this->getRequestArg('domain', $this->_sClientDomain, true);
+				$lsPort = $this->getRequestArg('port', '80', true);
+				$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", true);
+				$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", true);
+				$lsApacheDir = $this->getRequestArg('apachedir', $lsServerRoot);
 				
-				Debug::display("Backuping {$lsHosts} to {$lsHosts}.bkp");
-				$laReturn = System::execute("cp {$lsHosts} {$lsHosts}.bkp");
-				Debug::debug($laReturn);
-				Debug::display("Seting '{$lsLocalhost}\t{$lsDomain}' to {$lsHosts}");
-				$laReturn = System::execute("echo {$lsLocalhost}\t{$lsDomain} >> {$lsHosts}");
-				Debug::debug($laReturn);
-				
-				$laAppDirName = explode(DS, BASE_DIR);
-				$lsAppDirName = array_pop($laAppDirName);
+				if (file_exists($lsHosts))
+				{
+					echo("Backuping {$lsHosts} to {$lsHosts}.bkp\n");
+					$laReturn = System::execute("cp {$lsHosts} {$lsHosts}.bkp");
+					Debug::debug($laReturn);
+					echo("Seting '{$lsLocalhost}\t{$lsDomain}' to {$lsHosts}\n");
+					$laReturn = System::execute("echo {$lsLocalhost}\t{$lsDomain} >> {$lsHosts}");
+					Debug::debug($laReturn);
+				}
+				else
+				{
+					System::echoWarning("The {$lsHosts} does not exists!");
+				}
+								
 				$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . 'public';
 				$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
 				
-				Debug::display("Creating vhost: " . $lsSitesAvailablePath);
-				$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain, $lsPort);
-				Debug::debug($lsVirtualHost);
-				$laReturn = System::saveFile($lsSitesAvailablePath, trim($lsVirtualHost));
-				Debug::debug($laReturn);
+				if (!file_exists($lsSitesAvailablePath) || System::confirm("The vhost {$lsDomain}.conf already exists! Overwrite?"))
+				{
+					echo("Creating vhost: {$lsSitesAvailablePath}\n");
+					$lsVirtualHost = $this->vHost($lsDocumentRoot, $lsDomain, $lsPort);
+					Debug::debug($lsVirtualHost);
+					$laReturn = System::saveFile($lsSitesAvailablePath, trim($lsVirtualHost));
+					Debug::debug($laReturn);
+				}
 				
-				Debug::display("Enable vhost {$lsDomain}");
+				echo("Enable vhost {$lsDomain}\n");
 				$laReturn = System::execute("a2ensite {$lsDomain}");
 				Debug::debug($laReturn);
 			
-				if (System::confirm("Reload Apache2?") == "y")
+				if (System::confirm("Reload Apache2?"))
 				{
-					Debug::display("Apache reload");
+					echo("Apache reload\n");
 					$laReturn = System::execute(DS . "etc" . DS . "init.d" . DS . "apache2 reload");
 					Debug::debug($laReturn);
 				}
@@ -429,7 +459,7 @@ abstract class ToolAbstract extends AbstractController
 		}
 		else
 		{
-			Debug::exitError("You need root access to run this action! Please try run this action using sudo.");
+			System::echoError("You need root access to run this action! Please try run this action using sudo.");
 		}
 	}
 	
@@ -441,7 +471,7 @@ abstract class ToolAbstract extends AbstractController
 	 * @param string $psPort
 	 * @return string
 	 */
-	public function apacheConf ($psDocRoot, $psDomain, $psPort = "80")
+	public function vHost ($psDocRoot, $psDomain, $psPort = "80")
 	{
 		$lsVirtualHost = '
 		<VirtualHost *:' . $psPort . '>
@@ -488,8 +518,122 @@ abstract class ToolAbstract extends AbstractController
 	/**
 	 * 
 	 */
-	public function checkDependenciesAction ()
+	public function checkEnvAction ()
 	{
-		return true;
+		$lbCheck = true;
+		
+		$laPHPExtensions = array(
+			"date",
+			"ereg",
+			"bz2",
+			"calendar",
+			"hash",
+			"session",
+			"sockets",
+			"zip",
+			"PDO",
+			"curl",
+			"gd",
+			"intl",
+			"json",
+			"mysql",
+			"pdo_mysql",
+			"mhash"
+		);
+		
+		if (version_compare(phpversion(), '5.4', '>='))
+		{
+			System::echoSuccess("PHP " . phpversion() . " - OK");
+			
+			foreach ($laPHPExtensions as $lsExtension)
+			{
+				if (in_array($lsExtension, get_loaded_extensions()))
+				{
+					System::echoSuccess("PHP extension {$lsExtension} - OK");
+				}
+				else 
+				{
+					System::echoWarning("PHP extension {$lsExtension} - FAIL");
+					$lbCheck = false;
+				}
+			}
+			
+			if (ini_get('allow_url_fopen'))
+			{
+				System::echoSuccess("PHP fopen - OK");
+			}
+			else 
+			{
+				System::echoWarning("PHP - DISABLED");
+				$lbCheck = false;
+			}
+			
+			$laApacheReturn = System::execute("apachectl -M");
+			$lsModRewrite = false;
+			
+			if (is_array($laApacheReturn))
+			{
+				foreach ($laApacheReturn as $lsLine)
+				{
+					if (strpos($lsLine, 'rewrite'))
+					{
+						System::echoSuccess("Apache2 mod_rewrite - OK");
+						$lsModRewrite = true; 
+						continue;
+					}
+				}
+			}
+			
+			if (!$lsModRewrite)
+			{
+				System::echoWarning("Apache2 mod_rewrite - DISABLED");
+				$lbCheck = false;
+			}
+		}
+		else
+		{
+			System::echoWarning('You need PHP version 5.4 or latest!');
+			$lbCheck = false;
+		}
+		
+		return $lbCheck;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function getApacheConf ()
+	{
+		$laApacheReturn = System::execute("apachectl -t -D DUMP_RUN_CFG");
+		Debug::debug($laApacheReturn);
+		
+		if (is_array($laApacheReturn))
+		{
+			foreach ($laApacheReturn as $lsLine)
+			{
+				$laLine = explode(":", $lsLine);
+				
+				switch ($laLine[0])
+				{
+					case "ServerRoot":
+						preg_match("/\"(.*?)\"/", $laLine[1], $laMatch);
+						$laApache["ServerRoot"] = $laMatch[1];
+						break;
+					case "Main DocumentRoot":
+						preg_match("/\"(.*?)\"/", $laLine[1], $laMatch);
+						$laApache["DocumentRoot"] = $laMatch[1];
+						break;
+					case "Group":
+						preg_match("/name=\"(.*?)\" id=/", $laLine[1], $laMatch);
+						$laApache["Group"] = $laMatch[1];
+						break;
+				}
+			}
+		}
+		
+		Debug::debug($laApache);
+		
+		return $laApache;
 	}
 }

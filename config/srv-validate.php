@@ -57,6 +57,10 @@ $lgValidate = array(
 	'apachedir' => '^\/[a-zA-Z0-9\.-]+\/$',
 	'apachegrp' => '',
 	'port' => '^[0-9]{2,6}$',
+	'host' => '',
+	'user' => '',
+	'pass' => '',
+	'dbname' => '',
 );
 
 return array(

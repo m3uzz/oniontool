@@ -6,17 +6,6 @@ use OnionSrv\Debug;
 
 class #%MODULE%#Repository extends AbstractRepository
 {
-
-	/**
-	 * 
-	 * @param array $paDb
-	 */
-	public function __construct (array $paDb)
-	{
-		$this->setDbConf($paDb);
-	}
-
-
 	/**
 	 * 
 	 * @param int $pnStatus

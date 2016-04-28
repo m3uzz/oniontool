@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * This file is part of Onion Tool
@@ -42,18 +41,51 @@
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://github.com/m3uzz/oniontool
  */
+ 
+namespace OnionTool\Repository;
+use OnionSrv\Abstracts\AbstractRepository;
+use OnionSrv\Debug;
 
-defined('DS')		|| define('DS', DIRECTORY_SEPARATOR);
-defined('PS')  		|| define('PS', PATH_SEPARATOR);
-defined('EOF') 		|| define('EOF', chr(13).chr(10));
-defined('BIN_DIR') 	|| define('BIN_DIR', __DIR__);
-defined('BASE_DIR') 	|| define('BASE_DIR', realpath(dirname(dirname(dirname(dirname(__DIR__))))));
-defined('VENDOR_DIR') 	|| define('VENDOR_DIR', BASE_DIR . DS . 'vendor');
-defined('CLIENT_DIR') 	|| define('CLIENT_DIR', BASE_DIR . DS . 'client');
-defined('MODULE_DIR') 	|| define('MODULE_DIR', VENDOR_DIR . DS . 'm3uzz');
-defined('CONFIG_DIR') 	|| define('CONFIG_DIR', MODULE_DIR . DS . 'oniontool' . DS . 'config');
-
-$_SERVER['argv'][] = "-p";
-$_SERVER['argv'][] = "-m=onionTool";
-
-include VENDOR_DIR . DS . 'm3uzz' . DS . 'onionsrv' . DS . 'onionInit.php';
+class InstallRepository extends AbstractRepository
+{
+	/**
+	 * 
+	 * @param string $psDbName
+	 * @return array|boolean
+	 */
+	public function checkDb ($psDbName)
+	{
+		$lsSql = "USE {$psDbName}";
+		
+		if (!$this->execute($lsSql))
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psDbName
+	 * @return array|boolean
+	 */
+	public function createDb ($psDbName)
+	{
+		$lsSql = "CREATE DATABASE {$psDbName}";
+		
+		return $this->execute($lsSql);
+	}
+	
+	
+	/**
+	 *
+	 * @param string $psDbTables
+	 * @return array|boolean
+	 */
+	public function importDb ($psDbTables)
+	{
+		return $this->execute($psDbTables);
+	}
+}

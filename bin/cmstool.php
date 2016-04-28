@@ -53,6 +53,7 @@ defined('CLIENT_DIR') 	|| define('CLIENT_DIR', BASE_DIR . DS . 'client');
 defined('MODULE_DIR') 	|| define('MODULE_DIR', VENDOR_DIR . DS . 'm3uzz');
 defined('CONFIG_DIR') 	|| define('CONFIG_DIR', MODULE_DIR . DS . 'oniontool' . DS . 'config');
 
+$_SERVER['argv'][] = "-p";
 $_SERVER['argv'][] = "-m=onionTool";
 $_SERVER['argv'][] = "-c=cms";
 
