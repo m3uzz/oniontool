@@ -187,16 +187,15 @@ class CmsController extends ToolAbstract
 			$this->createDir($lsPathModule);
 		}
 		
-		$this->setModuleName("Backend");
-		$this->newModuleAction();
+		$this->newModuleAction("Backend");
 		
-		$this->setModuleName("Frontend");
-		$this->newModuleAction();
+		$this->newModuleAction("Frontend");
 		
 		$this->setModuleName($this->getRequestArg('module'));
 		
 		if ($this->_sModuleName != null)
 		{
+			$this->_sAction = "newModule";
 			$this->newModuleAction();
 		}
 		
@@ -220,11 +219,19 @@ class CmsController extends ToolAbstract
 	
 	/**
 	 * 
+	 * @param string $psModuleName
 	 */
-	public function newModuleAction ()
+	public function newModuleAction ($psModuleName = null)
 	{
-		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module'), null, true);
+		if ($psModuleName != null)
+		{
+			$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
+			$this->setModuleName($this->getRequestArg('module'), null, true);
+		}
+		else 
+		{
+			$this->setModuleName($psModuleName);
+		}	
 		
 		if ($this->_sModuleName == null)
 		{
