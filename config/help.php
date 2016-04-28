@@ -142,7 +142,7 @@ return array(
 				"params" => array(
 					"folder" => "Client folder name",
 					"domain" => "Domain for the virtual host access",
-					"port" => "Apache port to access virtual host",
+					"httpport" => "Apache port to access virtual host",
 					"docroot" => "Apache document root folder",
 					"hosts" => "Hosts file path",
 					"localhost" => "Localhost IP address",

@@ -414,7 +414,7 @@ abstract class ToolAbstract extends AbstractController
 			{
 				$lsClientFolder = $this->getRequestArg('folder', $this->_sClientFolder, true);
 				$lsDomain = $this->getRequestArg('domain', $this->_sClientDomain, true);
-				$lsPort = $this->getRequestArg('port', '80', true);
+				$lsPort = $this->getRequestArg('httpport', '80', true);
 				$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", true);
 				$lsLocalhost = $this->getRequestArg('localhost', "127.0.0.1", true);
 				$lsApacheDir = $this->getRequestArg('apachedir', $lsServerRoot);
