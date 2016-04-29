@@ -15,6 +15,9 @@ return array(
 		'pragma' 			=> 'no-cache', // no-cache | public,
 		'sysName'			=> 'm3uzz'
 	),
+	'bgVegas' => array(
+		//array('src' => '/vendor/m3uzz/onionjs-0.16.4/dist/img/trem.jpg')
+	),
 	'moduleConf' => array(
 
 	),
