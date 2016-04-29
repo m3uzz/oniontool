@@ -171,8 +171,8 @@ class CmsController extends ToolAbstract
 			$this->createDir($lsPathPublic, false);
 			$this->saveFile($lsPathPublic, 'index', $lsFileLicense);
 			$this->saveFile($lsPathPublic, 'htaccess');
-			$this->saveFile($lsPathPublic, 'robots');
-			$this->saveFile($lsPathPublic, 'sitemap');
+			$this->saveFile($lsPathPublic, 'robots', null, 'txt');
+			$this->saveFile($lsPathPublic, 'sitemap', null, 'xml');
 			
 			$lsPathPublicCss = $lsPathPublic . DS . 'css';
 			$this->createDir($lsPathPublicCss);
