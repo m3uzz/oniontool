@@ -223,7 +223,7 @@ class CmsController extends ToolAbstract
 	 */
 	public function newModuleAction ($psModuleName = null)
 	{
-		if ($psModuleName != null)
+		if ($psModuleName == null)
 		{
 			$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
 			$this->setModuleName($this->getRequestArg('module'), null, true);
