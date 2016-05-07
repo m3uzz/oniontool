@@ -404,7 +404,7 @@ abstract class ToolAbstract extends AbstractController
 			$laAppDirName = explode(DS, BASE_DIR);
 			$lsAppDirName = array_pop($laAppDirName);
 			
-			if (!file_exists($lsDocRoot . DS . $lsAppDirName) || System::confirm("The link {$lsDocRoot}" . DS . "{$lsAppDirName} already exists! Overwrite?"))
+			if (!file_exists($lsDocRoot . DS . $lsAppDirName) || System::confirm("The link {$lsDocRoot}{$lsAppDirName} already exists! Overwrite?"))
 			{
 				echo("Create project link to document root: " . BASE_DIR . "  to {$lsDocRoot}\n");
 				System::simblink(BASE_DIR, $lsDocRoot);
