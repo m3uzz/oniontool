@@ -86,7 +86,7 @@ class SrvController extends ToolAbstract
 	public function newClientAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module'));
+		$this->setModuleName($this->getRequestArg('module', "index"));
 		
 		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
 		
@@ -139,10 +139,20 @@ class SrvController extends ToolAbstract
 		
 		if ($this->_sModuleName == null)
 		{
-			$this->setModuleName("SrvApp");
+			$this->setModuleName("Index");
 		}
 		
 		$this->newServiceAction();
+		
+		if (System::confirm("Configure Apache 2 virtual host for dev environment? (You need to have root access!)"))
+		{
+			$this->_sAction = "virtualHostDev";
+			$this->virtualHostDevAction();
+		}
+		else
+		{
+			$this->showVHostConfAction();
+		}
 	}
 	
 	
@@ -212,7 +222,7 @@ class SrvController extends ToolAbstract
 		}
 		else 
 		{
-			Debug::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
+			System::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
 }

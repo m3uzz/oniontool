@@ -2,7 +2,7 @@
 
 return array(
 	'meta' => array(
-		'logoSite'			=> '',
+		'logoSite'			=> 'vendor/m3uzz/onionjs-0.16.4/dist/front/img/logo-dark.png',
 		'logoMobile'		=> '',
 		'frontCSS'			=> '',
 		'doctype' 			=> 'XHTML1_RDFA',

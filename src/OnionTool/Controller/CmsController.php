@@ -256,8 +256,20 @@ class CmsController extends ToolAbstract
 				
 				$lsPathModuleConfig = $lsPathModule . DS . 'config';
 				$this->createDir($lsPathModuleConfig);	
-				$this->saveFile($lsPathModuleConfig, 'module.config', $lsFileLicense);
-					
+				
+				if ($this->_sModuleName == "Backend")
+				{
+				    $this->saveFile($lsPathModuleConfig, 'dashboard.config', $lsFileLicense);
+				}
+				elseif ($this->_sModuleName == "Frontend")
+				{
+				    $this->saveFile($lsPathModuleConfig, 'site.config', $lsFileLicense);
+				}
+				else
+				{
+				    $this->saveFile($lsPathModuleConfig, 'module.config', $lsFileLicense);
+				}
+				
 				$lsModuleRoute = String::slugfy($this->_sModuleName);
 				
 				$lsPathView = $lsPathModule . DS . 'view';
@@ -266,12 +278,25 @@ class CmsController extends ToolAbstract
 				$this->createDir($lsPathViewModule);
 				$lsPathViewController = $lsPathViewModule . DS . $lsModuleRoute;
 				$this->createDir($lsPathViewController);
-				$this->saveFile($lsPathViewController, 'actionIndex', $lsFileLicense);
-				$this->saveFile($lsPathViewController, 'add', $lsFileLicense, 'phtml');
-				$this->saveFile($lsPathViewController, 'edit', $lsFileLicense, 'phtml');
+				
 				$this->saveFile($lsPathViewController, 'message', $lsFileLicense, 'phtml');
-				$this->saveFile($lsPathViewController, 'trash', $lsFileLicense, 'phtml');
-				$this->saveFile($lsPathViewController, 'view', $lsFileLicense, 'phtml');
+				
+				if ($this->_sModuleName == "Backend")
+				{
+				    $this->saveFile($lsPathViewController, 'dashboard', $lsFileLicense, 'phtml');
+				}
+				elseif ($this->_sModuleName == "Frontend")
+				{
+				    $this->saveFile($lsPathViewController, 'site', $lsFileLicense, 'phtml');
+				}
+				else
+				{
+				    $this->saveFile($lsPathViewController, 'actionIndex', $lsFileLicense);
+				    $this->saveFile($lsPathViewController, 'add', $lsFileLicense, 'phtml');
+    				$this->saveFile($lsPathViewController, 'edit', $lsFileLicense, 'phtml');
+    				$this->saveFile($lsPathViewController, 'trash', $lsFileLicense, 'phtml');
+    				$this->saveFile($lsPathViewController, 'view', $lsFileLicense, 'phtml');
+				}
 				
 				$lsPathSrc = $lsPathModule . DS . 'src';
 				$this->createDir($lsPathSrc);
@@ -285,25 +310,37 @@ class CmsController extends ToolAbstract
 					{
 						$lsPathController = $lsPathSrcModule . DS . 'Controller';
 						$this->createDir($lsPathController);
-						$this->saveFile($lsPathController, '_Controller', $lsFileLicense);
+						
+						if ($this->_sModuleName == "Backend")
+				        {
+				            $this->saveFile($lsPathController, '_Dashboard', $lsFileLicense);
+				        }
+				        elseif ($this->_sModuleName == "Frontend")
+				        {
+				            $this->saveFile($lsPathController, '_Site', $lsFileLicense);
+				        }
+				        else
+				        {
+						    $this->saveFile($lsPathController, '_Controller', $lsFileLicense);
+				        }
 
-						$lsPathEntity = $lsPathSrcModule . DS . 'Entity';
-						$this->createDir($lsPathEntity);
-						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense);
-						$this->saveFile($lsPathEntity, '_Basic', $lsFileLicense);
-						$this->saveFile($lsPathEntity, '_Extended', $lsFileLicense);
-						$this->saveFile($lsPathEntity, '_Repository', $lsFileLicense);
-						
-						$lsPathForm = $lsPathSrcModule . DS . 'Form';
-						$this->createDir($lsPathForm);
-						$this->saveFile($lsPathForm, '_Form', $lsFileLicense);
-						
-						//$lsPathGrid = $lsPathSrcModule . DS . 'Grid';
-						//$this->createDir($lsPathGrid);
-						//$this->saveFile($lsPathGrid, 'Grid', $lsFileLicense);
-						
-						if ($this->_sModuleName != "Backend" && $this->_sModuleName != "Frontend")
+				        if ($this->_sModuleName != "Backend" && $this->_sModuleName != "Frontend")
 						{
+    						$lsPathEntity = $lsPathSrcModule . DS . 'Entity';
+    						$this->createDir($lsPathEntity);
+    						$this->saveFile($lsPathEntity, 'Entity', $lsFileLicense);
+    						$this->saveFile($lsPathEntity, '_Basic', $lsFileLicense);
+    						$this->saveFile($lsPathEntity, '_Extended', $lsFileLicense);
+    						$this->saveFile($lsPathEntity, '_Repository', $lsFileLicense);
+    						
+    						$lsPathForm = $lsPathSrcModule . DS . 'Form';
+    						$this->createDir($lsPathForm);
+    						$this->saveFile($lsPathForm, '_Form', $lsFileLicense);
+    						
+    						//$lsPathGrid = $lsPathSrcModule . DS . 'Grid';
+    						//$this->createDir($lsPathGrid);
+    						//$this->saveFile($lsPathGrid, 'Grid', $lsFileLicense);
+
 							$this->setModuleAutoload($lsPathConfig);
 						}
 					}
@@ -619,7 +656,72 @@ class CmsController extends ToolAbstract
 		
 		$this->confDbAction($laDbConf);
 	}
+	
+	
+	/**
+	 * 
+	 */
+	public function createTableBaseAction ()
+	{
+	    $this->setClientFolder($this->getRequestArg('folder', null, true));
+		
+		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
+		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
+		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['production']['password']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
+		
+		$laDbConf = array(
+			'host' => $lsDbHost,
+			'port' => $lsDbPort,
+			'user' => $lsDbUser,
+			'pass' => $lsDbPass,
+		    'db' => $lsDbName,
+		);
+		
+		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
+		
+		if ($this->_aRepository['Db']->connect())
+		{
+		    $lsTableName = $this->getRequestArg('table', null, true);
+		    
+			if ($this->_aRepository['Db']->createTableBase($lsTableName))
+			{
+			    System::echoSuccess('Successful on create table base!');
+			}
+		}
+	}
 
+	
+	/**
+	 * 
+	 */
+	public function createUserDbAction ()
+	{
+		$lsDbHost = $this->getRequestArg('host', 'localhost');
+		$lsDbUser = $this->getRequestArg('user', null, true);
+		$lsDbPass = $this->getRequestArg('pass', null, true);
+		$lsDbName = $this->getRequestArg('dbname', null, true);
+		$lsDbTable = $this->getRequestArg('table', '*');
+		
+		$laDbConf = array(
+			'host' => '',
+			'port' => '',
+			'user' => '',
+			'pass' => '',
+		    'db' => '',
+		);		
+		
+		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
+		    
+		$lsScript = $this->_aRepository['Db']->createUser($lsDbHost, $lsDbUser, $lsDbPass, $lsDbName, $lsDbTable);
+
+		Debug::display($lsScript);
+	}
+	
 	
 	/**
 	 * 
@@ -663,6 +765,220 @@ class CmsController extends ToolAbstract
 		$lsFileContent = System::arrayToFile($laDbClientConf);
 		
 		System::saveFile($lsDbPath, $lsFileContent);
+	}
+	
+    
+	/**
+	 * 
+	 */
+	public function setFormAction ()
+	{
+		$this->setClientFolder($this->getRequestArg('folder', null, true));
+		$this->setModuleName($this->getRequestArg('module', null, true));
+		
+		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
+		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
+		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['production']['password']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
+		
+		$laDbConf = array(
+			'host' => $lsDbHost,
+			'port' => $lsDbPort,
+			'user' => $lsDbUser,
+			'pass' => $lsDbPass,
+		    'db' => $lsDbName,
+		);
+		
+		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
+		
+		if ($this->_aRepository['Db']->connect())
+		{
+		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
+		    
+		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+
+			if (is_array($laTable))
+			{
+			    $lsField = "";
+                $lsFieldSet = "";
+                
+			    foreach ($laTable as $laField)
+			    {
+			        if ($laField['Field'] != 'id')
+			        {
+    			        $lsRequired = 'false';
+    			        
+    			        if ($laField['Null'] == 'NO')
+    			        {
+    			            $lsRequired = 'true';
+    			        }
+    			        
+					    $lsFieldSet .= "'{$laField['Field']}',\n\t\t\t\t\t";
+    			        		        
+    			        $lsField .= "\$this->add(array(\n";
+    			        $lsField .= "\t\t\t'name' => '{$laField['Field']}',\n";
+    			        $lsField .= "\t\t\t'attributes' => array(\n";
+    			        $lsField .= "\t\t\t\t'id' => '{$laField['Field']}',\n";
+    			        $lsField .= "\t\t\t\t'type' => 'text',\n";
+    			        $lsField .= "\t\t\t\t'title' => Translator::i18n(''),\n";
+    			        $lsField .= "\t\t\t\t'class' => 'form-control',\n";
+    			        $lsField .= "\t\t\t\t'required' => {$lsRequired},\n";
+    			        $lsField .= "\t\t\t\t'placeholder' => Translator::i18n(''),\n";
+    			        $lsField .= "\t\t\t\t'data-mask' => '',\n";
+    			        $lsField .= "\t\t\t\t'data-mastalt' => '',\n";
+    			        $lsField .= "\t\t\t\t'pattern' => '',\n";
+    			        $lsField .= "\t\t\t),\n";
+    			        $lsField .= "\t\t\t'options' => array(\n";
+    			        $lsField .= "\t\t\t\t'label' => Translator::i18n('{$laField['Field']}') . ': ',\n";
+    			        $lsField .= "\t\t\t\t'for' => '{$laField['Field']}',\n";
+    			        $lsField .= "\t\t\t\t'length' => 6,\n";
+    			        $lsField .= "\t\t\t)\n";
+    			        $lsField .= "\t\t));\n\n\n\t\t";
+			        }
+			    }
+			    
+		        $lsPathSrcModule = CLIENT_DIR . DS . strtolower($this->_sClientFolder) . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
+    		    $lsPathForm = $lsPathSrcModule . DS . 'Form' . DS . "{$this->_sModuleName}Form.php";
+                $lsFileContent = System::localRequest($lsPathForm);
+			
+		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);
+		        Util::parse($lsFileContent, "#%FIELDSET%#", $lsFieldSet);
+		        System::saveFile($lsPathForm, $lsFileContent);
+			}
+		}	    
+	}
+
+	
+	/**
+	 * 
+	 */
+	public function setEntityAction ()
+	{
+		$this->setClientFolder($this->getRequestArg('folder', null, true));
+		$this->setModuleName($this->getRequestArg('module', null, true));
+		
+		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
+		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
+		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['production']['password']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
+		
+		$laDbConf = array(
+			'host' => $lsDbHost,
+			'port' => $lsDbPort,
+			'user' => $lsDbUser,
+			'pass' => $lsDbPass,
+		    'db' => $lsDbName,
+		);
+		
+		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
+		
+		if ($this->_aRepository['Db']->connect())
+		{
+		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
+		    
+		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+
+			if (is_array($laTable))
+			{
+			    $lsField = "";
+			    $lsData = "";
+			    
+			    foreach ($laTable as $laField)
+			    {
+			        $lsF = $laField['Field'];
+			        
+			        if ($lsF != 'id' && $lsF != 'User_id' && $lsF != 'dtInsert' && $lsF != 'dtUpdate' && $lsF != 'numStatus' && $lsF != 'isActive')
+			        {
+    			        $lsDefault = "";
+    			        $lsPri = "";
+    			        $lsAuto = "";
+    			        $lsNull = '* @ORM\Column(nullable=true)';
+    			        
+    			    	if ($laField['Default'] == '0' || !empty($laField['Default']))
+    			        {
+    			            $lsDefault = " = {$laField['Default']}";
+    			        }
+    			        
+    			        if ($laField['Key'] == 'PRI')
+    			        {
+    			            $lsPri = "\t" . '* @ORM\Id' . "\n";
+    			        }
+    			        
+    			    	if ($laField['Extra'] == 'auto_increment')
+    			        {
+    			            $lsAuto = "\t" . '* @ORM\GeneratedValue(strategy="AUTO")' . "\n";
+    			        }
+    			        
+    			        if ($laField['Null'] == 'NO')
+    			        {
+    			            $lsNull = '* @ORM\Column(nullable=false)';
+    			        }
+    			        
+    			        $laType = explode("(", $laField['Type']);
+    			        $lsType = $laType[0];
+    			        
+    			    	switch ($lsType)
+    			        {
+    			            case 'int':
+    			            case 'tinyint':
+    			            case 'smallint':
+    			            case 'mediumint':
+    			            case 'bigint':
+    			                 $lsFieldType = '* @ORM\Column(type="integer")';
+    			                 break;
+    			            case 'text':
+    			            case 'tinytext':
+    			            case 'mediumtext':
+    			            case 'longtext':
+    			            case 'blob':
+    			            case 'tinyblob':
+    			            case 'mediumblob':
+    			            case 'longblob':
+    			                $lsFieldType = '* @ORM\Column(type="text")';
+    			                 break;
+    			            case 'date':
+    			            case 'time':			                 
+    			            case 'timestamp':
+    			            case 'datetime':
+    			                 $lsFieldType = '* @ORM\Column(type="datetime")';
+    			                 break;
+    			            case 'decimal':
+    			            case 'float':
+    			            case 'double':
+    			            case 'real':
+    			                 $lsFieldType = '* @ORM\Column(type="decimal")';
+    			                 break;
+    			            case 'boolean':
+    			                 $lsFieldType = '* @ORM\Column(type="boolean")';
+    			                 break;
+    			            default:
+    			                 $lsFieldType = '* @ORM\Column(type="string")';
+    			        }	
+    			        
+    			        $lsField .= "\t/**\n{$lsPri}{$lsAuto}\t{$lsFieldType}\n\t{$lsNull}\n\t*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
+    	
+    			        
+    			        $lsData .= "\t\t\$laData['{$laField['Field']}'] = \$this->{$laField['Field']};\n";
+			        }
+			    }
+			    
+		        $lsPathSrcModule = CLIENT_DIR . DS . strtolower($this->_sClientFolder) . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
+    		    $lsPathEntity = $lsPathSrcModule . DS . 'Entity' . DS . "{$this->_sModuleName}.php";
+                $lsFileContent = System::localRequest($lsPathEntity);
+			
+		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);
+		        Util::parse($lsFileContent, "#%DATA%#", $lsData);
+		        System::saveFile($lsPathEntity, $lsFileContent);
+			}
+		}	    
 	}
 	
 	

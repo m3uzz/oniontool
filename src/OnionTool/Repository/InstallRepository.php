@@ -80,6 +80,19 @@ class InstallRepository extends AbstractRepository
 	
 	
 	/**
+	 * 
+	 * @param string $psDbName
+	 * @return array|boolean
+	 */
+	public function dropDb ($psDbName)
+	{
+		$lsSql = "DROP DATABASE {$psDbName}";
+		
+		return $this->execute($lsSql);
+	}
+	
+	
+	/**
 	 *
 	 * @param string $psDbTables
 	 * @return array|boolean
@@ -87,5 +100,67 @@ class InstallRepository extends AbstractRepository
 	public function importDb ($psDbTables)
 	{
 		return $this->execute($psDbTables);
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psTableName
+	 * @return array|boolean
+	 */
+	public function createTableBase ($psTableName)
+	{
+	    $lsSql = "CREATE TABLE IF NOT EXISTS `{$psTableName}` (
+                    `id` int(10) unsigned NOT NULL,
+                    `User_id` int(10) unsigned NOT NULL,
+                    `dtInsert` timestamp NULL DEFAULT NULL,
+                    `dtUpdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    `numStatus` tinyint(4) unsigned DEFAULT '0',
+                    `isActive` enum('0','1') DEFAULT '0'
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+                  ALTER TABLE `{$psTableName}` ADD PRIMARY KEY (`id`);";
+	    
+	    return $this->execute($lsSql);
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psHost
+	 * @param string $psUser
+	 * @param string $psPass
+	 * @param string $psDb
+	 * @param string $psTable
+	 * @return string
+	 */
+	public function createUser ($psHost, $psUser, $psPass, $psDb, $psTable)
+	{
+	    if (empty($psTable))
+	    {
+	        $psTable = '*';
+	    }
+	    
+	    if (empty($psHost))
+	    {
+	        $psHost = '%';
+	    }
+	    
+	    $lsSql = "GRANT SELECT, INSERT, UPDATE, DELETE, FILE, INDEX ON {$psDb}.{$psTable} TO '{$psUser}'@'{$psHost}' IDENTIFIED BY '{$psPass}';";
+		
+		return $lsSql;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psTable
+	 * @return array|boolean|null
+	 */
+	public function getTableDesc ($psTable)
+	{
+		$lsSql = "DESC {$psTable}";
+		
+		return $this->descTable($lsSql);
 	}
 }

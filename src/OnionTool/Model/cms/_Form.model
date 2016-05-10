@@ -28,6 +28,22 @@ class #%MODULE%#Form extends Form
 		
 		$this->_sCancelBtnType = 'cancel';
 		
+		$this->_bformHTML5Validate = true;
+		
+		$this->_aFieldSet = array(
+            'CompanyData' => array(
+                'label' => 'Dados do Cliente',
+                'icon' => 'glyphicon glyphicon-user',
+                'class' => '',
+                'fields' => array(
+                    'security',
+                    'id',
+                    '-',
+                    #%FIELDSET%#
+                )
+            ),
+        );
+
 		// we want to ignore the name passed
 		parent::__construct($this->_sForm);
 	}
@@ -56,6 +72,7 @@ class #%MODULE%#Form extends Form
 			)
 		));
 		
+		#%FIELDS%#
 		$this->add(new Csrf('security'));
 		
 		$this->add(array(

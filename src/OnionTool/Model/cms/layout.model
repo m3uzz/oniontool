@@ -2,18 +2,18 @@
 
 return array(
 	'indexController' 	=> 'Frontend\Controller\Frontend',
-	'indexAction' 		=> 'index',
+	'indexAction' 		=> 'site',
 	'indexParam' 		=> '',	
 	'directAssets' 		=> false,
 	'defaultDir'		=> 'layout',
 	'clientDir'			=> CLIENT_DIR,
-	'frontend'			=> CLIENT_DIR.DS.'public'.DS.'layout',
-	'backend'			=> BASE_DIR.DS.'layout'.DS.'backend',
-	'exception'			=> BASE_DIR.DS.'exception',
+    'frontend'          => BASE_DIR . DS . 'layout' . DS . 'theme' . DS . 'landx',
+    'backend'           => BASE_DIR . DS . 'layout' . DS . 'theme' . DS . 'lumino',
+    'exception'         => BASE_DIR . DS . 'layout' . DS . 'theme' . DS . 'exception',
 	
 	'module_layouts' => array(
 		'Frontend' 		=> 'layout/home',
-		'Access' 		=> 'layout/home',
+		'Access' 		=> 'layout/login',
 		'Backend' 		=> 'layout/layout',
 		'Popup' 		=> 'layout/popup',
 		'Container' 	=> 'layout/container',

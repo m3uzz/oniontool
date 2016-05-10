@@ -72,7 +72,7 @@ return array(
 				"params" => array(
 					"folder" => "Client folder name",
 					"domain" => "Domain for the virtual host access",
-					"port" => "Apache port to access virtual host",
+					"httpport" => "Apache port to access virtual host",
 					"docroot" => "Apache document root folder",
 					"hosts" => "Hosts file path",
 					"localhost" => "Localhost IP address",
@@ -84,6 +84,15 @@ return array(
 				"desc" => "Information to set Apache2 and configure the virtual host",
 				"params" => array(),
 			),
+			"uninstallClient" => array(
+				"desc" => "Remove all references about client project",
+				"params" => array(
+					"folder" => "Client folder name",
+					"domain" => "Domain for the virtual host access",
+					"docroot" => "Apache document root folder",
+					"apachedir" => "Apache config path",
+				),
+			),		    
 			"checkEnv" => array(
 				"desc" => "Check system environment to verify dependencies",
 				"params" => array(),
@@ -137,6 +146,54 @@ return array(
 					"dbname" => "MySql database name",
 				),
 			),
+			"createTableBase" => array(
+				"desc" => "Create a base table with some default fields",
+				"params" => array(
+					"folder" => "Client folder name",
+					"host" => "MySql server host address",
+					"port" => "MySql server port",
+					"user" => "MySql user",
+					"pass" => "MySql user password",
+					"dbname" => "MySql database name",
+				    "table" => "MySql database table name to create",
+				),
+			),		     
+			"setEntity" => array(
+				"desc" => "Set module entity as table structure",
+				"params" => array(
+					"folder" => "Client folder name",
+				    "module" => "Module name",
+					"host" => "MySql server host address",
+					"port" => "MySql server port",
+					"user" => "MySql user",
+					"pass" => "MySql user password",
+					"dbname" => "MySql database name",
+				    "table" => "MySql database table name",
+				),
+			),	
+			"setForm" => array(
+				"desc" => "Set module form as table structure",
+				"params" => array(
+					"folder" => "Client folder name",
+				    "module" => "Module name",
+					"host" => "MySql server host address",
+					"port" => "MySql server port",
+					"user" => "MySql user",
+					"pass" => "MySql user password",
+					"dbname" => "MySql database name",
+				    "table" => "MySql database table name",
+				),
+			),			        
+			"createUserDb" => array(
+				"desc" => "Generate a sql command to create a new user to access database",
+				"params" => array(
+					"host" => "MySql server host address",
+					"user" => "MySql new username",
+					"pass" => "MySql new user password",
+					"dbname" => "MySql database to give access",
+					"table" => "MySql specifique table to give access",
+				),
+			),		        
 			"virtualHostDev" => array(
 				"desc" => "Configure Apache2 virutal hosts for the dev environment",
 				"params" => array(
@@ -154,6 +211,15 @@ return array(
 				"desc" => "Information to set Apache2 and configure the virtual host",
 				"params" => array(),
 			),
+			"uninstallClient" => array(
+				"desc" => "Remove all references about client project",
+				"params" => array(
+					"folder" => "Client folder name",
+					"domain" => "Domain for the virtual host access",
+					"docroot" => "Apache document root folder",
+					"apachedir" => "Apache config path",
+				),
+			),		    
 			"checkEnv" => array(
 				"desc" => "Check system environment to verify dependencies",
 				"params" => array(),

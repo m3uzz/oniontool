@@ -62,6 +62,7 @@ $lgValidate = array(
 	'user' => '',
 	'pass' => '',
 	'dbname' => '',
+    'table' => '',
 );
 
 return array(

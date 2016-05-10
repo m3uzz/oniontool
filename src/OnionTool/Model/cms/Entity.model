@@ -29,6 +29,7 @@ abstract class #%MODULE%# extends Entity
 	 */
 	protected $User_id;
 
+    #%FIELDS%#
 	/**
 	 * @ORM\Column(type="datetime")
 	 * @ORM\Column(nullable=true)
@@ -67,6 +68,8 @@ abstract class #%MODULE%# extends Entity
 	public function getFormatedData ()
 	{
 		$laData['id'] = $this->id;
+		$laData['User_id'] = $this->User_id;
+#%DATA%#
 		$laData['dtInsert'] = $this->dtInsert;
 		$laData['dtUpdate'] = $this->dtUpdate;
 		$laData['numStatus'] = $this->numStatus;

@@ -23,11 +23,15 @@ return array(
 					'message' => 'guest',
 				),
             	'Backend' => array(
-            		'index' => 'client',
+            		'dashboard' => 'client',
             		'message' => 'guest',
             		'push' => 'guest',
-            		'clear-flash' => 'guest',
+                    'clear-flash' => 'guest',
             	),
+                'Frontend' => array(
+                    'site' => 'guest',
+                    'message' => 'guest',
+                ),            	
 				'Access' => array(
 					'login' => 'guest',
 					'logout' => 'guest',
@@ -122,21 +126,6 @@ return array(
             		'message' => 'admin',
             		'csv' => 'admin',
             		'pdf' => 'admin'
-            	),
-            	'Frontend' => array(
-            		'index' => 'guest',
-            		'trash' => 'guest',
-            		'add' => 'guest',
-            		'edit' => 'guest',
-            		'view' => 'guest',
-            		'move' => 'guest',
-            		'delete' => 'guest',
-            		'move-list' => 'guest',
-            		'delete-list' => 'guest',
-            		'search-select' => 'guest',
-            		'search' => 'guest',
-            		'message' => 'guest',
-            		'csv' => 'guest',
             	),
             )
         )

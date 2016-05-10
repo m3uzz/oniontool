@@ -13,7 +13,7 @@ return array(
 		'lang' 				=> 'pt',
 		'locale' 			=> 'pt_BR',
 		'pragma' 			=> 'no-cache', // no-cache | public,
-		'sysName'			=> 'm3uzz'
+		'sysName'			=> 'Onion App'
 	),
 	'bgVegas' => array(
 		//array('src' => '/vendor/m3uzz/onionjs-0.16.4/dist/img/trem.jpg')

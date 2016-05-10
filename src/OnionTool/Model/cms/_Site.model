@@ -1,0 +1,44 @@
+<?php
+#%LICENSE%#
+namespace #%MODULE%#\Controller;
+use Onion\Mvc\Controller\ControllerActionBase;
+use Onion\View\Model\ViewModel;
+use Onion\Log\Debug;
+use Onion\I18n\Translator;
+use Onion\Application\Application;
+use Onion\Lib\String;
+use Onion\Config\Config;
+
+class #%MODULE%#Controller extends ControllerActionBase
+{
+
+	/**
+	 */
+	public function __construct ()
+	{
+		$this->_sModule = '#%MODULE%#';
+		
+		$this->_sRoute = '#%ROUTE%#';
+		
+		$this->_sLayout = 'Frontend';
+		
+		$this->_sWindowType = 'default';
+		
+		$this->_sResponse = 'html';
+		
+		$this->_sTitleS = Translator::i18n('#%MODULE%#');
+		
+		$this->_sTitleP = Translator::i18n('#%MODULE%#');
+	}
+	
+	
+	 /**
+     * 
+     * @return \Onion\View\Model\ViewModel
+     */
+    public function siteAction ()
+    {
+        $loView = new ViewModel();
+        return $this->setResponseType($loView);
+    }
+}

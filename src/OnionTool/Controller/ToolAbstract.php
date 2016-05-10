@@ -44,6 +44,7 @@
 
 namespace OnionTool\Controller;
 use OnionSrv\Abstracts\AbstractController;
+use OnionTool\Repository\InstallRepository;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
@@ -288,11 +289,20 @@ abstract class ToolAbstract extends AbstractController
 				$lsFileName = ".{$psFile}";
 				break;
 			case 'Entity':
+			case 'EntityEmpty':
 				$lsFileName = "{$this->_sModuleName}.php";
 				break;
 			case 'actionIndex':
 				$lsFileName = "index.phtml";
 				break;
+			case '_Dashboard':
+			case '_Site':
+			    $lsFileName = "{$this->_sModuleName}Controller.php";
+			    break;
+			case 'dashboard.config':
+			case 'site.config':
+			    $lsFileName = "module.config.php";
+			    break;
 			default:
 				$lsFileName = "{$psFile}.{$psFileType}";
 				$lsFileName = preg_replace("/_/", $this->_sModuleName, $lsFileName);
@@ -371,6 +381,12 @@ abstract class ToolAbstract extends AbstractController
 		$loHelp->display();
 	}
 	
+	public function thisTest ()
+	{
+	    //Debug::display(CLIENT_DIR);
+	    Debug::display(BIN_DIR);
+	    //Debug::display($this);
+	}
 	
 	/**
 	 * 
@@ -412,7 +428,13 @@ abstract class ToolAbstract extends AbstractController
 			
 			if (System::confirm("Create Apache virtual host?"))
 			{
-				$lsClientFolder = $this->getRequestArg('folder', $this->_sClientFolder, true);
+    			$lsClientFolder = $this->getRequestArg('folder', $this->_sClientFolder, true);
+
+				if (empty($this->_sClientDomain))
+			    {
+			        $this->_sClientDomain = "local.{$lsClientFolder}";
+			    }
+			    
 				$lsDomain = $this->getRequestArg('domain', $this->_sClientDomain, true);
 				$lsPort = $this->getRequestArg('httpport', '80', true);
 				$lsHosts = $this->getRequestArg('hosts', DS . "etc" . DS . "hosts", true);
@@ -432,8 +454,17 @@ abstract class ToolAbstract extends AbstractController
 				{
 					System::echoWarning("The {$lsHosts} does not exists!");
 				}
-								
-				$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . 'public';
+                
+				if ($this->_sController == 'Cms')
+				{
+				    $lsPublicFolder = 'public';
+				}
+				elseif ($this->_sController == 'Srv')
+				{
+				    $lsPublicFolder = 'srv-public';
+				}
+				
+				$lsDocumentRoot = $lsDocRoot . $lsAppDirName . DS . 'client' . DS . $lsClientFolder . DS . $lsPublicFolder;
 				$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
 				
 				if (!file_exists($lsSitesAvailablePath) || System::confirm("The vhost {$lsDomain}.conf already exists! Overwrite?"))
@@ -461,6 +492,99 @@ abstract class ToolAbstract extends AbstractController
 		{
 			System::echoError("You need root access to run this action! Please try run this action using sudo.");
 		}
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function uninstallClientAction ()
+	{
+		if ($_SERVER["USER"] == "root")
+		{
+			$lsClientFolder = $this->getRequestArg('folder', null, true);
+		
+			if ($this->_sController == 'Cms')
+			{
+		        $lsDbPath = CLIENT_DIR . DS . $lsClientFolder . DS . 'config' . DS . 'db.php';
+		        $laDbClientConf = require($lsDbPath);
+		        
+			    $laDbConf = array(
+        			'host' => $laDbClientConf['production']['hostname'],
+        			'port' => $laDbClientConf['production']['port'],
+        			'user' => $laDbClientConf['production']['username'],
+        			'pass' => $laDbClientConf['production']['password'],
+			        'db' => $laDbClientConf['production']['database'],
+        		);		        
+			}
+		    
+		    if (System::confirm("Remove client project folder {$lsClientFolder}?"))
+		    {
+		        System::removeDir($lsClientFolder);
+		    }
+		    
+			$laApacheConf = $this->getApacheConf();
+			
+			if (is_array($laApacheConf))
+			{
+				$lsDocRoot = $laApacheConf['DocumentRoot'] . DS;
+				$lsServerRoot = $laApacheConf['ServerRoot'] . DS;
+			}
+			else 
+			{
+				$lsDocRoot = DS . "var" . DS . "www" . DS;
+				$lsServerRoot = DS . "etc" . DS . "apache2" . DS;
+			}
+			
+			if (System::confirm("Remove link from document root?"))
+			{
+			    $lsDocRoot = $this->getRequestArg('docroot', $lsDocRoot, true);
+			    $laAppDirName = explode(DS, BASE_DIR);
+			    $lsAppDirName = array_pop($laAppDirName);
+			    
+				System::removeSimblink($lsDocRoot . DS . $lsAppDirName);
+			}
+			
+			if (System::confirm("Remove Apache virtual host?"))
+			{
+			    $lsDomain = $this->getRequestArg('domain', "local.{$lsClientFolder}", true);
+				$lsApacheDir = $this->getRequestArg('apachedir', $lsServerRoot);
+				
+				$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";
+				$lsSitesEnablePath = $lsApacheDir . 'sites-enabled' . DS . "{$lsDomain}.conf";
+				
+			    System::removeFile($lsSitesAvailablePath);
+			    System::removeSimblink($lsSitesEnablePath);
+				
+				if (System::confirm("Reload Apache2?"))
+				{
+					echo("Apache reload\n");
+					$laReturn = System::execute(DS . "etc" . DS . "init.d" . DS . "apache2 reload");
+					Debug::debug($laReturn);
+				}
+			}
+			
+			if ($this->_sController == 'Cms' && System::confirm("Drop database?"))
+			{
+        		$this->_aRepository['db'] = new InstallRepository($laDbConf);
+        		
+        		if ($this->_aRepository['db']->connect())
+        		{
+        		    if (System::confirm("Confirm drop database {$laDbConf['host']}:{$laDbConf['db']}?"))
+			        {
+            			if (!$this->_aRepository['db']->dropDb($laDbConf['db']))
+            			{
+    				        System::echoWarning("There is something wrong!");
+    				        return;        			    
+            			}
+			        }
+        		}
+			}
+		}
+		else
+		{
+			System::echoError("You need root access to run this action! Please try run this action using sudo.");
+		}	    
 	}
 	
 	
