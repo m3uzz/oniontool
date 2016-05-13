@@ -696,12 +696,12 @@ class CmsController extends ToolAbstract
 			}
 			else 
 			{
-			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			    System::echoError($this->_aRepository['Db']->getErrorMsg());
 			}
 		}
 		else
 		{
-		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		    System::echoError($this->_aRepository['Db']->getErrorMsg());
 		}
 	}
 
@@ -861,12 +861,12 @@ class CmsController extends ToolAbstract
 			}
 			else 
 			{
-			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			    System::echoError($this->_aRepository['Db']->getErrorMsg());
 			}
 		}
 		else 
 		{
-		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		    System::echoError($this->_aRepository['Db']->getErrorMsg());
 		}
 	}
 
@@ -998,12 +998,12 @@ class CmsController extends ToolAbstract
 			}
 			else 
 			{
-			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			    System::echoError($this->_aRepository['Db']->getErrorMsg());
 			}
 		}
 		else 
 		{
-		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		    System::echoError($this->_aRepository['Db']->getErrorMsg());
 		}
 	}
 	
