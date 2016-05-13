@@ -560,8 +560,8 @@ class CmsController extends ToolAbstract
 	{
 		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		
-		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
-		$laDbClientConf = require($lsDbPath);
+		$lsDbPath = 'config' . DS . 'db.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
@@ -667,8 +667,8 @@ class CmsController extends ToolAbstract
 	{
 	    $this->setClientFolder($this->getRequestArg('folder', null, true));
 		
-		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
-		$laDbClientConf = require($lsDbPath);
+		$lsDbPath = 'config' . DS . 'db.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
@@ -740,8 +740,8 @@ class CmsController extends ToolAbstract
 	{
 		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		
-		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
-		$laDbClientConf = require($lsDbPath);
+		$lsDbPath = 'config' . DS . 'db.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 
 		if ($paDbConf == null)
 		{
@@ -786,8 +786,8 @@ class CmsController extends ToolAbstract
 		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		$this->setModuleName($this->getRequestArg('module', null, true));
 		
-		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
-		$laDbClientConf = require($lsDbPath);
+		$lsDbPath = 'config' . DS . 'db.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
@@ -879,8 +879,8 @@ class CmsController extends ToolAbstract
 		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		$this->setModuleName($this->getRequestArg('module', null, true));
 		
-		$lsDbPath = $this->_sClientFolder . DS . 'config' . DS . 'db.php';
-		$laDbClientConf = require($lsDbPath);
+		$lsDbPath = 'config' . DS . 'db.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
