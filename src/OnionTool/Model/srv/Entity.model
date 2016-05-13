@@ -6,9 +6,9 @@ use OnionSrv\Debug;
 
 /**
  * Table schema
- * @table = #%MODULE%#
+ * @table = #%TABLE%#
 */
-class #%MODULE%# extends Entity
+class #%TABLE%# extends Entity
 {
 	/**
 	 * @var integer PK

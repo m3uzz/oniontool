@@ -5,12 +5,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="#%MODULE%#")
+ * @ORM\Table(name="#%TABLE%#")
  * @ORM\Entity(repositoryClass="#%MODULE%#\Entity\#%MODULE%#Repository")
  */
-class #%MODULE%#Extended extends #%MODULE%#
+class #%TABLE%#Extended extends #%MODULE%#
 {
 
-	protected $_sEntity = '#%MODULE%#\Entity\#%MODULE%#Extended';
+	protected $_sEntity = '#%MODULE%#\Entity\#%TABLE%#Extended';
 }
 	

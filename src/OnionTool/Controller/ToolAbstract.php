@@ -334,6 +334,7 @@ abstract class ToolAbstract extends AbstractController
 			
 			Util::parse($lsFileContent, "#%LICENSE%#", $psFileLicense);
 			Util::parse($lsFileContent, "#%MODULE%#", $this->_sModuleName);
+			Util::parse($lsFileContent, "#%TABLE%#", $this->_sModuleName);
 			Util::parse($lsFileContent, "#%ACTION%#", String::lcfirst($this->_sModuleName));
 			
 			Util::parse($lsFileContent, "#%ROUTE%#", String::slugfy($this->_sModuleName));

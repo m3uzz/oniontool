@@ -340,8 +340,9 @@ class SrvController extends ToolAbstract
                 {
                     $lsFileContent = System::localRequest($this->_sModelPath . DS . "Entity.model");
                     $lsFileLicense = $this->getLicense($this->_sModuleName);
-        			Util::parse($lsFileContent, "#%LICENSE%#", $psFileLicense);
+        			Util::parse($lsFileContent, "#%LICENSE%#", $lsFileLicense);
         			Util::parse($lsFileContent, "#%MODULE%#", $this->_sModuleName);
+        			Util::parse($lsFileContent, "#%TABLE%#", $lsTableName);
                 }
                 
 		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);

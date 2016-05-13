@@ -989,9 +989,18 @@ class CmsController extends ToolAbstract
 			    }
 			    
 		        $lsPathSrcModule = $this->_sClientPath . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
-    		    $lsPathEntity = $lsPathSrcModule . DS . 'Entity' . DS . "{$this->_sModuleName}.php";
+    		    $lsPathEntity = $lsPathSrcModule . DS . 'Entity' . DS . "{$lsTableName}.php";
                 $lsFileContent = System::localRequest($lsPathEntity);
 			
+			    if ($lsFileContent == false)
+                {
+                    $lsFileContent = System::localRequest($this->_sModelPath . DS . "Entity.model");
+                    $lsFileLicense = $this->getLicense($this->_sModuleName);
+        			Util::parse($lsFileContent, "#%LICENSE%#", $lsFileLicense);
+        			Util::parse($lsFileContent, "#%MODULE%#", $this->_sModuleName);
+        			Util::parse($lsFileContent, "#%TABLE%#", $lsTableName);
+                }
+                
 		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);
 		        Util::parse($lsFileContent, "#%DATA%#", $lsData);
 		        System::saveFile($lsPathEntity, $lsFileContent);

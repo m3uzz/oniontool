@@ -8,13 +8,13 @@ use Onion\Log\Debug;
 
 /**
  * ORM\Entity
- * ORM\Table(name="#%MODULE%#")
+ * ORM\Table(name="#%TABLE%#")
  * ORM\Entity(repositoryClass="#%MODULE%#\Entity\#%MODULE%#Repository")
  */
-abstract class #%MODULE%# extends Entity
+abstract class #%TABLE%# extends Entity
 {
 
-	protected $_sEntity = '#%MODULE%#\Entity\#%MODULE%#';
+	protected $_sEntity = '#%MODULE%#\Entity\#%TABLE%#';
 
 	/**
 	 * @ORM\Id
