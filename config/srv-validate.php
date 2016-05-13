@@ -47,6 +47,7 @@ $lgValidate = array(
 	'folder' => '^[a-z0-9\.]{3,80}$',
 	'domain' => '^[a-z0-9\.]{3,80}$',
 	'module' => '',
+    'service' => '',
 	'author' => '',
 	'email' => '',
 	'link' => '',

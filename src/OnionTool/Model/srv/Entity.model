@@ -20,6 +20,7 @@ class #%MODULE%# extends Entity
 	 */
 	protected $User_id;
 	
+	#%FIELDS%#
 	/**
 	 * @var datetime
 	 */

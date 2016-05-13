@@ -55,6 +55,8 @@ use OnionLib\Util;
 abstract class ToolAbstract extends AbstractController
 {
 
+    protected $_sClientPath;
+    
 	protected $_sModelPath;
 	
 	protected $_sDbPath;
@@ -77,6 +79,7 @@ abstract class ToolAbstract extends AbstractController
 	public function setClientFolder($psFolder)
 	{
 		$this->_sClientFolder = $psFolder;
+		$this->_sClientPath = BASE_DIR . DS . 'client' . DS .strtolower($psFolder);
 		
 		return $this;
 	}
@@ -129,6 +132,20 @@ abstract class ToolAbstract extends AbstractController
 		}
 
 		return $this;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public function checkCli ()
+	{
+		if (PHP_SAPI != "cli")
+	    {
+    		header('HTTP/1.1 403 Forbidden');
+    		echo "ACCESS FORBIDDEN";
+	   	    exit(403);
+	    }	    
 	}
 	
 	
@@ -338,7 +355,7 @@ abstract class ToolAbstract extends AbstractController
 	{
 		$lsDomain = "local.project-name";
 		$lsDocumentRoot = "/var/www/path/to/the/client/public";
-		$lsVirtualHost = $this->apacheConf($lsDocumentRoot, $lsDomain);
+		$lsVirtualHost = $this->vHost($lsDocumentRoot, $lsDomain);
 		$lsAppFolder = "/foo/bar/application/folder";
 		
 		$loHelp = new Help();
@@ -381,13 +398,7 @@ abstract class ToolAbstract extends AbstractController
 		$loHelp->display();
 	}
 	
-	public function thisTest ()
-	{
-	    //Debug::display(CLIENT_DIR);
-	    Debug::display(BIN_DIR);
-	    //Debug::display($this);
-	}
-	
+
 	/**
 	 * 
 	 */
@@ -502,11 +513,11 @@ abstract class ToolAbstract extends AbstractController
 	{
 		if ($_SERVER["USER"] == "root")
 		{
-			$lsClientFolder = $this->getRequestArg('folder', null, true);
+			$this->setClientFolder($this->getRequestArg('folder', null, true));
 		
 			if ($this->_sController == 'Cms')
 			{
-		        $lsDbPath = CLIENT_DIR . DS . $lsClientFolder . DS . 'config' . DS . 'db.php';
+		        $lsDbPath = $this->_sClientPath . DS . 'config' . DS . 'db.php';
 		        $laDbClientConf = require($lsDbPath);
 		        
 			    $laDbConf = array(
@@ -518,9 +529,9 @@ abstract class ToolAbstract extends AbstractController
         		);		        
 			}
 		    
-		    if (System::confirm("Remove client project folder {$lsClientFolder}?"))
+		    if (System::confirm("Remove client project folder {$this->_sClientFolder}?"))
 		    {
-		        System::removeDir($lsClientFolder);
+		        System::removeDir($this->_sClientPath);
 		    }
 		    
 			$laApacheConf = $this->getApacheConf();
@@ -547,7 +558,7 @@ abstract class ToolAbstract extends AbstractController
 			
 			if (System::confirm("Remove Apache virtual host?"))
 			{
-			    $lsDomain = $this->getRequestArg('domain', "local.{$lsClientFolder}", true);
+			    $lsDomain = $this->getRequestArg('domain', "local.{$this->_sClientFolder}", true);
 				$lsApacheDir = $this->getRequestArg('apachedir', $lsServerRoot);
 				
 				$lsSitesAvailablePath = $lsApacheDir . 'sites-available' . DS . "{$lsDomain}.conf";

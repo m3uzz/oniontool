@@ -49,7 +49,7 @@ return array(
 				"desc" => "Create a new client structure folder",
 				"params" => array(
 					"folder" => "Client folder name",
-					"module" => "Service name",
+					"service" => "Service name",
 					"author" => "Author name",
 					"email" => "Author e-mail",
 					"link" => "Project link or repository",
@@ -60,13 +60,26 @@ return array(
 				"desc" => "Create a new service for a existent client",
 				"params" => array(
 					"folder" => "Client folder name",
-					"module" => "Service name",
+					"service" => "Service name",
 					"author" => "Author name",
 					"email" => "Author e-mail",
 					"link" => "Project link or repository",
 					"cinit" => "Copyrigth year",
 				),
 			),
+			"setEntity" => array(
+				"desc" => "Set module entity as table structure",
+				"params" => array(
+					"folder" => "Client folder name",
+				    "service" => "Service name",
+					"host" => "MySql server host address",
+					"port" => "MySql server port",
+					"user" => "MySql user",
+					"pass" => "MySql user password",
+					"dbname" => "MySql database name",
+				    "table" => "MySql database table name",
+				),
+			),		        
 			"virtualHostDev" => array(
 				"desc" => "Configure Apache2 virutal hosts for the dev environment",
 				"params" => array(

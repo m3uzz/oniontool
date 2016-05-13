@@ -57,6 +57,8 @@ class CmsController extends ToolAbstract
 	 */
 	public function init ()
 	{
+	    $this->checkCli();
+	    
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'cms';
 		$this->_sDbPath = dirname($this->_sControllerPath) . DS . 'Db';
 		$this->_sLayoutVendor = BASE_DIR . DS . 'layout' . DS . 'vendor';
@@ -121,7 +123,7 @@ class CmsController extends ToolAbstract
 		$this->setClientDomain($this->getRequestArg('domain', "local.{$this->_sClientFolder}"));
 		$this->setClientName($this->getRequestArg('client', "OnionApp"));
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
+		$lsPathClient = $this->_sClientPath;
 		
 		$this->createDir($lsPathClient);
 		
@@ -239,7 +241,7 @@ class CmsController extends ToolAbstract
 			return;
 		}
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
+		$lsPathClient = $this->_sClientPath;
 		$lsPathModules = $lsPathClient . DS . 'module';
 		$lsPathConfig = $lsPathClient . DS . 'config';
 		
@@ -841,7 +843,7 @@ class CmsController extends ToolAbstract
 			        }
 			    }
 			    
-		        $lsPathSrcModule = CLIENT_DIR . DS . strtolower($this->_sClientFolder) . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
+		        $lsPathSrcModule = $this->_sClientPath . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
     		    $lsPathForm = $lsPathSrcModule . DS . 'Form' . DS . "{$this->_sModuleName}Form.php";
                 $lsFileContent = System::localRequest($lsPathForm);
 			
@@ -970,7 +972,7 @@ class CmsController extends ToolAbstract
 			        }
 			    }
 			    
-		        $lsPathSrcModule = CLIENT_DIR . DS . strtolower($this->_sClientFolder) . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
+		        $lsPathSrcModule = $this->_sClientPath . DS . 'module' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
     		    $lsPathEntity = $lsPathSrcModule . DS . 'Entity' . DS . "{$this->_sModuleName}.php";
                 $lsFileContent = System::localRequest($lsPathEntity);
 			

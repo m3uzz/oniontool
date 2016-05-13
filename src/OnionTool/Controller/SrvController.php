@@ -43,6 +43,7 @@
  */
 
 namespace OnionTool\Controller;
+use OnionTool\Repository\InstallRepository;
 use OnionSrv\Config;
 use OnionSrv\Debug;
 use OnionSrv\System;
@@ -56,6 +57,8 @@ class SrvController extends ToolAbstract
 	 */
 	public function init ()
 	{
+        $this->checkCli();
+	    
 		$this->_sModelPath = dirname($this->_sControllerPath) . DS . 'Model' . DS . 'srv';
 	}
 
@@ -86,9 +89,9 @@ class SrvController extends ToolAbstract
 	public function newClientAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module', "index"));
+		$this->setModuleName($this->getRequestArg('service', "index"));
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
+		$lsPathClient = $this->_sClientPath;
 		
 		$this->createDir($lsPathClient);
 		
@@ -162,15 +165,15 @@ class SrvController extends ToolAbstract
 	public function newServiceAction ()
 	{
 		$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-		$this->setModuleName($this->getRequestArg('module', null, true));
+		$this->setModuleName($this->getRequestArg('service', null, true));
 		
 		if ($this->_sModuleName == null)
 		{
-			System::echoError("The param module is required! Please, use --help for further information.");
+			System::echoError("The param service is required! Please, use --help for further information.");
 			return;
 		}
 		
-		$lsPathClient = CLIENT_DIR . DS . strtolower($this->_sClientFolder);
+		$lsPathClient = $this->_sClientPath;
 		$lsPathService = $lsPathClient . DS . 'service';
 		$lsPathConfig = $lsPathClient . DS . 'config';
 		
@@ -225,4 +228,117 @@ class SrvController extends ToolAbstract
 			System::exitError("Client folder do not exist! You need to create a new client first. Please, use --help for further information.");
 		}
 	}
+	
+	
+	/**
+	 * 
+	 */
+	public function setEntityAction ()
+	{
+		$this->setClientFolder($this->getRequestArg('folder', null, true));
+		$this->setModuleName($this->getRequestArg('service', null, true));
+		
+		$lsDbPath = 'config' . DS . 'srv-service.php';
+		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
+		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['db']['host']);
+		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['db']['port']);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['db']['user']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['db']['pass']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['db']['db'], true);
+		
+		$laDbConf = array(
+			'host' => $lsDbHost,
+			'port' => $lsDbPort,
+			'user' => $lsDbUser,
+			'pass' => $lsDbPass,
+		    'db' => $lsDbName,
+		);
+		
+		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
+		
+		if ($this->_aRepository['Db']->connect())
+		{
+		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
+		    
+		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+
+			if (is_array($laTable))
+			{
+			    $lsField = "";
+			    $lsData = "";
+			    
+			    foreach ($laTable as $laField)
+			    {
+			        $lsF = $laField['Field'];
+			        
+			        if ($lsF != 'id' && $lsF != 'User_id' && $lsF != 'dtInsert' && $lsF != 'dtUpdate' && $lsF != 'numStatus' && $lsF != 'isActive')
+			        {
+    			        $lsDefault = "";
+    			        $lsPri = "";
+    			        
+    			    	if ($laField['Default'] == '0' || !empty($laField['Default']))
+    			        {
+    			            $lsDefault = " = {$laField['Default']}";
+    			        }
+    			        
+    			        if ($laField['Key'] == 'PRI')
+    			        {
+    			            $lsPri = " PK";
+    			        }
+    			        
+    			        $laType = explode("(", $laField['Type']);
+    			        $lsType = $laType[0];
+    			        
+    			    	switch ($lsType)
+    			        {
+    			            case 'int':
+    			            case 'tinyint':
+    			            case 'smallint':
+    			            case 'mediumint':
+    			            case 'bigint':
+    			                 $lsFieldType = '* @var integer';
+    			                 break;
+    			            case 'text':
+    			            case 'tinytext':
+    			            case 'mediumtext':
+    			            case 'longtext':
+    			            case 'blob':
+    			            case 'tinyblob':
+    			            case 'mediumblob':
+    			            case 'longblob':
+    			                $lsFieldType = '* @var text';
+    			                 break;
+    			            case 'date':
+    			            case 'time':			                 
+    			            case 'timestamp':
+    			            case 'datetime':
+    			                 $lsFieldType = '* @var datetime';
+    			                 break;
+    			            case 'decimal':
+    			            case 'float':
+    			            case 'double':
+    			            case 'real':
+    			                 $lsFieldType = '* @var decimal';
+    			                 break;
+    			            case 'boolean':
+    			                 $lsFieldType = '* @var boolean';
+    			                 break;
+    			            default:
+    			                 $lsFieldType = '* @var string';
+    			        }	
+    			        
+    			        $lsField .= "\t/**\n\t{$lsFieldType}{$lsPri}\n\t*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
+			        }
+			    }
+			    
+		        $lsPathSrcModule = $this->_sClientPath . DS . 'service' . DS . $this->_sModuleName . DS . 'src' . DS . $this->_sModuleName;			    
+    		    $lsPathEntity = $lsPathSrcModule . DS . 'Entity' . DS . "{$this->_sModuleName}.php";
+                $lsFileContent = System::localRequest($lsPathEntity);
+			
+		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);
+		        System::saveFile($lsPathEntity, $lsFileContent);
+			}
+		}	    
+	}	
 }
