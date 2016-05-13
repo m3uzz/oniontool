@@ -228,7 +228,7 @@ class CmsController extends ToolAbstract
 		if ($psModuleName == null)
 		{
 			$this->setClientFolder($this->getRequestArg('folder', "onionapp.com"));
-			$this->setModuleName($this->getRequestArg('module'), null, true);
+			$this->setModuleName($this->getRequestArg('module', null, true));
 		}
 		else 
 		{
@@ -694,6 +694,14 @@ class CmsController extends ToolAbstract
 			{
 			    System::echoSuccess('Successful on create table base!');
 			}
+			else 
+			{
+			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			}
+		}
+		else
+		{
+		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
 		}
 	}
 
@@ -851,7 +859,15 @@ class CmsController extends ToolAbstract
 		        Util::parse($lsFileContent, "#%FIELDSET%#", $lsFieldSet);
 		        System::saveFile($lsPathForm, $lsFileContent);
 			}
-		}	    
+			else 
+			{
+			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			}
+		}
+		else 
+		{
+		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		}
 	}
 
 	
@@ -980,7 +996,15 @@ class CmsController extends ToolAbstract
 		        Util::parse($lsFileContent, "#%DATA%#", $lsData);
 		        System::saveFile($lsPathEntity, $lsFileContent);
 			}
-		}	    
+			else 
+			{
+			    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+			}
+		}
+		else 
+		{
+		    System::echoError($this->_aRepository['newDb']->getErrorMsg());
+		}
 	}
 	
 	
