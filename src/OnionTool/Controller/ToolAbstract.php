@@ -522,11 +522,13 @@ abstract class ToolAbstract extends AbstractController
 		        $laDbClientConf = require($lsDbPath);
 		        
 			    $laDbConf = array(
-        			'host' => $laDbClientConf['production']['hostname'],
+		            'driver' => $laDbClientConf['production']['driver'],
+		            'charset' => $laDbClientConf['production']['charset'],				            
+        			'hostname' => $laDbClientConf['production']['hostname'],
         			'port' => $laDbClientConf['production']['port'],
-        			'user' => $laDbClientConf['production']['username'],
-        			'pass' => $laDbClientConf['production']['password'],
-			        'db' => $laDbClientConf['production']['database'],
+        			'username' => $laDbClientConf['production']['username'],
+        			'password' => $laDbClientConf['production']['password'],
+			        'database' => $laDbClientConf['production']['database'],
         		);		        
 			}
 		    
@@ -582,9 +584,9 @@ abstract class ToolAbstract extends AbstractController
         		
         		if ($this->_aRepository['db']->connect())
         		{
-        		    if (System::confirm("Confirm drop database {$laDbConf['host']}:{$laDbConf['db']}?"))
+        		    if (System::confirm("Confirm drop database {$laDbConf['hostname']}:{$laDbConf['database']}?"))
 			        {
-            			if (!$this->_aRepository['db']->dropDb($laDbConf['db']))
+            			if (!$this->_aRepository['db']->dropDb($laDbConf['database']))
             			{
     				        System::echoWarning("There is something wrong!");
     				        return;        			    
@@ -646,24 +648,22 @@ abstract class ToolAbstract extends AbstractController
 			CustomLog ${APACHE_LOG_DIR}/access.log combined
 		</VirtualHost>
 		';
-		
-		return $lsVirtualHost;
-	}
-	
-	
-	/**
-	 * 
-	 */
-	public function checkEnvAction ()
-	{
-		$lbCheck = true;
-		
-		$laPHPExtensions = array(
-			"date",
-			"ereg",
-			"bz2",
-			"calendar",
-			"hash",
+        
+        return $lsVirtualHost;
+    }
+
+    /**
+     */
+    public function checkEnvAction ()
+    {
+        $lbCheck = true;
+        
+        $laPHPExtensions = array(
+                "date",
+                "ereg",
+                "bz2",
+                "calendar",
+                "hash",
 			"session",
 			"sockets",
 			"zip",
@@ -704,26 +704,62 @@ abstract class ToolAbstract extends AbstractController
 				$lbCheck = false;
 			}
 			
-			$laApacheReturn = System::execute("apachectl -M");
-			$lsModRewrite = false;
+			if ($this->checkCommandLine('apachectl'))
+			{
+			     $laApacheReturn = System::execute("apachectl -M");
+			}
+			elseif ($this->checkCommandLine('httpd'))
+			{
+			     $laApacheReturn = System::execute("httpd -M");
+			}
+			
+			$laModules = array(
+			    'php5' => false,
+		        'rewrite' => false,
+		        'deflate' => false,
+		        'expires' => false,
+		        'headers' => false,
+			);
 			
 			if (is_array($laApacheReturn))
 			{
 				foreach ($laApacheReturn as $lsLine)
 				{
-					if (strpos($lsLine, 'rewrite'))
+					if (strpos($lsLine, 'deflate'))
 					{
-						System::echoSuccess("Apache2 mod_rewrite - OK");
-						$lsModRewrite = true; 
-						continue;
+						System::echoSuccess("Apache2 mod_deflate - OK");
+						$laModules['deflate'] = true; 
 					}
+					elseif (strpos($lsLine, 'php5'))
+					{
+					    System::echoSuccess("Apache2 mod_php5 - OK");
+						$laModules['php5'] = true; 
+					}
+				    elseif (strpos($lsLine, 'rewrite'))
+					{
+					    System::echoSuccess("Apache2 mod_rewrite - OK");
+						$laModules['rewrite'] = true; 
+					}
+					elseif (strpos($lsLine, 'expires'))
+					{
+					    System::echoSuccess("Apache2 mod_expires - OK");
+						$laModules['expires'] = true; 
+					}
+					elseif (strpos($lsLine, 'headers'))
+					{
+					    System::echoSuccess("Apache2 mod_headers - OK");
+						$laModules['headers'] = true; 
+					}					
 				}
 			}
 			
-			if (!$lsModRewrite)
+			foreach ($laModules as $lsModule => $lbOk)
 			{
-				System::echoWarning("Apache2 mod_rewrite - DISABLED");
-				$lbCheck = false;
+			    if (!$lbOk)
+			    {
+				    System::echoWarning("Apache2 mod_{$lsModule} - DISABLED");
+				    $lbCheck = false;
+			    }
 			}
 		}
 		else
@@ -741,7 +777,15 @@ abstract class ToolAbstract extends AbstractController
 	 */
 	public function getApacheConf ()
 	{
-		$laApacheReturn = System::execute("apachectl -t -D DUMP_RUN_CFG");
+	    if ($this->checkCommandLine('apachectl'))
+	    {
+		    $laApacheReturn = System::execute("apachectl -t -D DUMP_RUN_CFG");
+	    }
+	    elseif ($this->checkCommandLine('httpd'))
+	    {
+		    $laApacheReturn = System::execute("httpd -t -D DUMP_RUN_CFG");
+	    }	    
+	    
 		Debug::debug($laApacheReturn);
 		
 		if (is_array($laApacheReturn))
@@ -771,5 +815,24 @@ abstract class ToolAbstract extends AbstractController
 		Debug::debug($laApache);
 		
 		return $laApache;
+	}
+	
+	
+	/**
+	 * 
+	 * @param string $psCommand
+	 * @return bool
+	 */
+	public function checkCommandLine ($psCommand)
+	{
+	    $laCommandReturn = System::execute("command -v {$psCommand}");
+		Debug::debug($laCommandReturn);
+	    
+		if (is_array($laCommandReturn) && count($laCommandReturn) > 0)
+		{
+		    return true;
+		}
+		
+		return false;
 	}
 }

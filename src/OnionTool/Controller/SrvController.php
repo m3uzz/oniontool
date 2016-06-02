@@ -241,18 +241,22 @@ class SrvController extends ToolAbstract
 		$lsDbPath = 'config' . DS . 'srv-service.php';
 		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
-		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['db']['host']);
+		$lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['db']['driver']);
+		$lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['db']['charset']);		
+		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['db']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['db']['port']);
-		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['db']['user']);
-		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['db']['pass']);
-		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['db']['db'], true);
+		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['db']['username']);
+		$lsDbPass = $this->getRequestArg('pass', $laDbClientConf['db']['password']);
+		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['db']['database'], true);
 		
 		$laDbConf = array(
-			'host' => $lsDbHost,
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,			        
+			'hostname' => $lsDbHost,
 			'port' => $lsDbPort,
-			'user' => $lsDbUser,
-			'pass' => $lsDbPass,
-		    'db' => $lsDbName,
+			'username' => $lsDbUser,
+			'password' => $lsDbPass,
+		    'database' => $lsDbName,
 		);
 		
 		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
@@ -261,7 +265,7 @@ class SrvController extends ToolAbstract
 		{
 		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
 		    
-		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+		    $laTable = $this->_aRepository['Db']->descEntity($lsTableName);
 
 			if (is_array($laTable))
 			{
@@ -276,6 +280,9 @@ class SrvController extends ToolAbstract
 			        {
     			        $lsDefault = "";
     			        $lsPri = "";
+    			        $lsPriORM = "";
+    			        $lsAuto = "";
+    			        $lsNull = '* @ORM\Column(nullable=true)';    			        
     			        
     			    	if ($laField['Default'] == '0' || !empty($laField['Default']))
     			        {
@@ -285,6 +292,17 @@ class SrvController extends ToolAbstract
     			        if ($laField['Key'] == 'PRI')
     			        {
     			            $lsPri = " PK";
+    			            $lsPriORM = "\n\t" . '* @ORM\Id';
+    			        }
+    			        
+			            if ($laField['Extra'] == 'auto_increment')
+    			        {
+    			            $lsAuto = "\n\t" . '* @ORM\GeneratedValue(strategy="AUTO")';
+    			        }
+    			        
+    			        if ($laField['Null'] == 'NO')
+    			        {
+    			            $lsNull = '* @ORM\Column(nullable=false)';
     			        }
     			        
     			        $laType = explode("(", $laField['Type']);
@@ -298,6 +316,7 @@ class SrvController extends ToolAbstract
     			            case 'mediumint':
     			            case 'bigint':
     			                 $lsFieldType = '* @var integer';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="integer")';
     			                 break;
     			            case 'text':
     			            case 'tinytext':
@@ -307,28 +326,33 @@ class SrvController extends ToolAbstract
     			            case 'tinyblob':
     			            case 'mediumblob':
     			            case 'longblob':
-    			                $lsFieldType = '* @var text';
+    			                 $lsFieldType = '* @var text';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="text")';
     			                 break;
     			            case 'date':
     			            case 'time':			                 
     			            case 'timestamp':
     			            case 'datetime':
     			                 $lsFieldType = '* @var datetime';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="datetime")';
     			                 break;
     			            case 'decimal':
     			            case 'float':
     			            case 'double':
     			            case 'real':
     			                 $lsFieldType = '* @var decimal';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="decimal")';
     			                 break;
     			            case 'boolean':
     			                 $lsFieldType = '* @var boolean';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="boolean")';
     			                 break;
     			            default:
     			                 $lsFieldType = '* @var string';
+    			                 $lsFieldTypeORM = '* @ORM\Column(type="string")';
     			        }	
     			        
-    			        $lsField .= "\t/**\n\t{$lsFieldType}{$lsPri}\n\t*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
+    			        $lsField .= "\t/**\n\t{$lsFieldType}{$lsPri}{$lsPriORM}{$lsAuto}\n\t{$lsFieldTypeORM}\n\t{$lsNull}*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
 			        }
 			    }
 			    

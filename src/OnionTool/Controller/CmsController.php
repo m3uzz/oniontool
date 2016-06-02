@@ -195,7 +195,7 @@ class CmsController extends ToolAbstract
 		
 		$this->setModuleName($this->getRequestArg('module'));
 		
-		if ($this->_sModuleName != null)
+		if ($this->_sModuleName != null && $this->_sModuleName != "Frontend")
 		{
 			$this->_sAction = "newModule";
 			$this->newModuleAction();
@@ -563,6 +563,8 @@ class CmsController extends ToolAbstract
 		$lsDbPath = 'config' . DS . 'db.php';
 		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
+		$lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['production']['driver']);
+		$lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['production']['charset']);
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
 		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
@@ -570,10 +572,12 @@ class CmsController extends ToolAbstract
 		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
 		
 		$laDbConf = array(
-			'host' => $lsDbHost,
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,
+			'hostname' => $lsDbHost,
 			'port' => $lsDbPort,
-			'user' => $lsDbUser,
-			'pass' => $lsDbPass,
+			'username' => $lsDbUser,
+			'password' => $lsDbPass,
 		);
 		
 		$this->_aRepository['newDb'] = new InstallRepository($laDbConf);
@@ -586,7 +590,7 @@ class CmsController extends ToolAbstract
 				{
 					if ($this->_aRepository['newDb']->createDb($lsDbName))
 					{
-						$laDbConf['db'] = $lsDbName;
+						$laDbConf['database'] = $lsDbName;
 					}
 					else
 					{
@@ -602,7 +606,7 @@ class CmsController extends ToolAbstract
 			}
 			elseif (System::confirm("The database [{$lsDbName}] already exists! Confirm use this database?"))
 			{
-				$laDbConf['db'] = $lsDbName;
+				$laDbConf['database'] = $lsDbName;
 			}
 			else
 			{
@@ -670,6 +674,8 @@ class CmsController extends ToolAbstract
 		$lsDbPath = 'config' . DS . 'db.php';
 		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
+		$lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['production']['driver']);
+		$lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['production']['charset']);		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
 		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
@@ -677,11 +683,13 @@ class CmsController extends ToolAbstract
 		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
 		
 		$laDbConf = array(
-			'host' => $lsDbHost,
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,		        
+			'hostname' => $lsDbHost,
 			'port' => $lsDbPort,
-			'user' => $lsDbUser,
-			'pass' => $lsDbPass,
-		    'db' => $lsDbName,
+			'username' => $lsDbUser,
+			'password' => $lsDbPass,
+		    'database' => $lsDbName,
 		);
 		
 		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
@@ -711,6 +719,8 @@ class CmsController extends ToolAbstract
 	 */
 	public function createUserDbAction ()
 	{
+		$lsDbDriver = $this->getRequestArg('driver', 'PDOMySql');
+		$lsDbCharset = $this->getRequestArg('charset', 'UTF8');	    
 		$lsDbHost = $this->getRequestArg('host', 'localhost');
 		$lsDbUser = $this->getRequestArg('user', null, true);
 		$lsDbPass = $this->getRequestArg('pass', null, true);
@@ -718,11 +728,13 @@ class CmsController extends ToolAbstract
 		$lsDbTable = $this->getRequestArg('table', '*');
 		
 		$laDbConf = array(
-			'host' => '',
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,		        
+			'hostname' => '',
 			'port' => '',
-			'user' => '',
-			'pass' => '',
-		    'db' => '',
+			'username' => '',
+			'password' => '',
+		    'database' => '',
 		);		
 		
 		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
@@ -740,11 +752,13 @@ class CmsController extends ToolAbstract
 	{
 		$this->setClientFolder($this->getRequestArg('folder', null, true));
 		
-		$lsDbPath = 'config' . DS . 'db.php';
-		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
+		$lsDbPath = $this->_sClientPath . DS . 'config' . DS . 'db.php';
+		$laDbClientConf = require($lsDbPath);
 
 		if ($paDbConf == null)
 		{
+		    $lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['production']['driver']);
+		    $lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['production']['charset']);			    
 			$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 			$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
 			$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
@@ -752,25 +766,31 @@ class CmsController extends ToolAbstract
 			$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
 			
 			$paDbConf = array(
-				'host' => $lsDbHost,
+		        'driver' => $lsDbDriver,
+		        'charset' => $lsDbCharset,	
+				'hostname' => $lsDbHost,
 				'port' => $lsDbPort,
-				'user' => $lsDbUser,
-				'pass' => $lsDbPass,
-				'db' => $lsDbName
+				'username' => $lsDbUser,
+				'password' => $lsDbPass,
+				'database' => $lsDbName
 			);
 		}
 				
-		$laDbClientConf['production']['hostname'] = $paDbConf['host'];
+		$laDbClientConf['production']['driver'] = $paDbConf['driver'];
+		$laDbClientConf['production']['charset'] = $paDbConf['charset'];
+		$laDbClientConf['production']['hostname'] = $paDbConf['hostname'];
 		$laDbClientConf['production']['port'] = $paDbConf['port'];
-		$laDbClientConf['production']['username'] = $paDbConf['user'];
-		$laDbClientConf['production']['password'] = $paDbConf['pass'];
-		$laDbClientConf['production']['database'] = $paDbConf['db'];
+		$laDbClientConf['production']['username'] = $paDbConf['username'];
+		$laDbClientConf['production']['password'] = $paDbConf['password'];
+		$laDbClientConf['production']['database'] = $paDbConf['database'];
 		
-		$laDbClientConf['development']['hostname'] = $paDbConf['host'];
+		$laDbClientConf['development']['driver'] = $paDbConf['driver'];
+		$laDbClientConf['development']['charset'] = $paDbConf['charset'];		
+		$laDbClientConf['development']['hostname'] = $paDbConf['hostname'];
 		$laDbClientConf['development']['port'] = $paDbConf['port'];
-		$laDbClientConf['development']['username'] = $paDbConf['user'];
-		$laDbClientConf['development']['password'] = $paDbConf['pass'];
-		$laDbClientConf['development']['database'] = $paDbConf['db'];
+		$laDbClientConf['development']['username'] = $paDbConf['username'];
+		$laDbClientConf['development']['password'] = $paDbConf['password'];
+		$laDbClientConf['development']['database'] = $paDbConf['database'];
 		
 		$lsFileContent = System::arrayToFile($laDbClientConf);
 		
@@ -789,6 +809,8 @@ class CmsController extends ToolAbstract
 		$lsDbPath = 'config' . DS . 'db.php';
 		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
+		$lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['production']['driver']);
+		$lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['production']['charset']);		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
 		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
@@ -796,11 +818,13 @@ class CmsController extends ToolAbstract
 		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
 		
 		$laDbConf = array(
-			'host' => $lsDbHost,
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,		        
+			'hostname' => $lsDbHost,
 			'port' => $lsDbPort,
-			'user' => $lsDbUser,
-			'pass' => $lsDbPass,
-		    'db' => $lsDbName,
+			'username' => $lsDbUser,
+			'password' => $lsDbPass,
+		    'database' => $lsDbName,
 		);
 		
 		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
@@ -809,7 +833,7 @@ class CmsController extends ToolAbstract
 		{
 		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
 		    
-		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+		    $laTable = $this->_aRepository['Db']->descEntity($lsTableName);
 
 			if (is_array($laTable))
 			{
@@ -882,6 +906,8 @@ class CmsController extends ToolAbstract
 		$lsDbPath = 'config' . DS . 'db.php';
 		$laDbClientConf = require($this->_sClientPath . DS . $lsDbPath);
 		
+		$lsDbDriver = $this->getRequestArg('driver', $laDbClientConf['production']['driver']);
+		$lsDbCharset = $this->getRequestArg('charset', $laDbClientConf['production']['charset']);		
 		$lsDbHost = $this->getRequestArg('host', $laDbClientConf['production']['hostname']);
 		$lsDbPort = $this->getRequestArg('port', $laDbClientConf['production']['port']);
 		$lsDbUser = $this->getRequestArg('user', $laDbClientConf['production']['username']);
@@ -889,11 +915,13 @@ class CmsController extends ToolAbstract
 		$lsDbName = $this->getRequestArg('dbname', $laDbClientConf['production']['database'], true);
 		
 		$laDbConf = array(
-			'host' => $lsDbHost,
+		    'driver' => $lsDbDriver,
+		    'charset' => $lsDbCharset,		        
+			'hostname' => $lsDbHost,
 			'port' => $lsDbPort,
-			'user' => $lsDbUser,
-			'pass' => $lsDbPass,
-		    'db' => $lsDbName,
+			'username' => $lsDbUser,
+			'password' => $lsDbPass,
+		    'database' => $lsDbName,
 		);
 		
 		$this->_aRepository['Db'] = new InstallRepository($laDbConf);
@@ -902,7 +930,7 @@ class CmsController extends ToolAbstract
 		{
 		    $lsTableName = $this->getRequestArg('table', $this->_sModuleName, true);
 		    
-		    $laTable = $this->_aRepository['Db']->getTableDesc($lsTableName);
+		    $laTable = $this->_aRepository['Db']->descEntity($lsTableName);
 
 			if (is_array($laTable))
 			{
@@ -960,7 +988,7 @@ class CmsController extends ToolAbstract
     			            case 'tinyblob':
     			            case 'mediumblob':
     			            case 'longblob':
-    			                $lsFieldType = '* @ORM\Column(type="text")';
+    			                 $lsFieldType = '* @ORM\Column(type="text")';
     			                 break;
     			            case 'date':
     			            case 'time':			                 

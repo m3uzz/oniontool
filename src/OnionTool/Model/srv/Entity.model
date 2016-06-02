@@ -7,37 +7,53 @@ use OnionSrv\Debug;
 /**
  * Table schema
  * @table = #%TABLE%#
-*/
+ * @ORM\Entity
+ * @ORM\Table(name="#%TABLE%#")
+ * @ORM\Entity(repositoryClass="#%MODULE%#\Repository\#%MODULE%#Repository")
+ */
 class #%TABLE%# extends Entity
 {
 	/**
 	 * @var integer PK
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")	 
 	 */
 	protected $id;
 	
 	/**
 	 * @var integer
-	 */
+     * @ORM\Column(type="integer")
+     * @ORM\Column(nullable=true)
+     */	 
 	protected $User_id;
 	
 	#%FIELDS%#
 	/**
 	 * @var datetime
-	 */
+     * @ORM\Column(type="datetime")
+     * @ORM\Column(nullable=true)
+     */
 	protected $dtInsert;
 	
 	/**
 	 * @var datetime
-	 */
+     * @ORM\Column(type="datetime")
+     * @ORM\Column(nullable=true)
+     */
 	protected $dtUpdate;
 	
 	/**
 	 * @var integer
+     * @ORM\Column(type="integer")
+     * @ORM\Column(nullable=true)	 
 	 */
 	protected $numStatus = 0;
 	
 	/**
 	 * @var boolean
+     * @ORM\Column(type="boolean")
+     * @ORM\Column(nullable=true)	 
 	 */
 	protected $isActive = 1;
 }

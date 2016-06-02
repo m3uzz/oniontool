@@ -75,7 +75,7 @@ class InstallRepository extends AbstractRepository
 	{
 		$lsSql = "CREATE DATABASE {$psDbName}";
 		
-		return $this->execute($lsSql);
+		return $this->create($lsSql);
 	}
 	
 	
@@ -121,7 +121,7 @@ class InstallRepository extends AbstractRepository
 
                   ALTER TABLE `{$psTableName}` ADD PRIMARY KEY (`id`);";
 	    
-	    return $this->execute($lsSql);
+	    return $this->create($lsSql);
 	}
 	
 	
@@ -150,17 +150,14 @@ class InstallRepository extends AbstractRepository
 		
 		return $lsSql;
 	}
-	
-	
+
 	/**
 	 * 
-	 * @param string $psTable
-	 * @return array|boolean|null
-	 */
-	public function getTableDesc ($psTable)
+	 * @param array $paConf
+	 * @return bool
+	 */	
+	public function connect (array $paConf = null)
 	{
-		$lsSql = "DESC {$psTable}";
-		
-		return $this->descTable($lsSql);
+	    return $this->_oConnection->connect($paConf);
 	}
 }

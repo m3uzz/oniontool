@@ -2,10 +2,12 @@
 
 return array(
 	'db' => array(
-		'host' => 'localhost',
-		'user' => 'root',
-		'pass' => '',
-		'db' => '',
+	    'driver' => 'PDOMySql',
+        'charset' => 'UTF8',
+		'hostname' => 'localhost',
+		'username' => 'root',
+		'password' => '',
+		'database' => '',
 		'port' => '3306'
 	),
 );

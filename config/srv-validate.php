@@ -62,6 +62,8 @@ $lgValidate = array(
 	'host' => '',
 	'user' => '',
 	'pass' => '',
+    'driver' => '',
+    'charset' => '',
 	'dbname' => '',
     'table' => '',
 );
