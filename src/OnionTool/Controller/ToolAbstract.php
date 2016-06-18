@@ -659,11 +659,11 @@ abstract class ToolAbstract extends AbstractController
         $lbCheck = true;
         
         $laPHPExtensions = array(
-                "date",
-                "ereg",
-                "bz2",
-                "calendar",
-                "hash",
+            "date",
+            "ereg",
+            "bz2",
+            "calendar",
+            "hash",
 			"session",
 			"sockets",
 			"zip",
@@ -674,7 +674,7 @@ abstract class ToolAbstract extends AbstractController
 			"json",
 			"mysql",
 			"pdo_mysql",
-			"mhash"
+			"mhash",
 		);
 		
 		if (version_compare(phpversion(), '5.4', '>='))
