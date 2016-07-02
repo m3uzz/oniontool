@@ -225,7 +225,7 @@ abstract class ToolAbstract extends AbstractController
 			$laMenu['admin'][$this->_sModuleName] = array(
 				'accesskey' => '',
 				'label' => $lsModuleLabel,
-				'link' => "/{$lsRoute}",
+				'link' => "{$lsRoute}",
 				'description' => '',
 				'icon' => 'glyphicon glyphicon-cog',
 				'submenu' => null,

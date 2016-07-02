@@ -38,6 +38,7 @@ return array(
 		'pattern'  	=> '%s.mo',
 		'datetime'	=> 'America/Sao_Paulo',
 		'local'		=> 'br',
+		'dateFormat'  => 'd-m-Y',
 	),
 	'output' => array(
 		'encoding'		=> 'UTF-8',
