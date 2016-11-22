@@ -61,21 +61,5 @@ abstract class #%TABLE%# extends Entity
 	{
 		return $this;
 	}
-
-	
-	/**
-	 */
-	public function getFormatedData ()
-	{
-		$laData['id'] = $this->id;
-		$laData['User_id'] = $this->User_id;
-#%DATA%#
-		$laData['dtInsert'] = $this->dtInsert;
-		$laData['dtUpdate'] = $this->dtUpdate;
-		$laData['numStatus'] = $this->numStatus;
-		$laData['isActive'] = $this->isActive;		
-			
-		return $laData;
-	}
 }
 	

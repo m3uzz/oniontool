@@ -935,7 +935,6 @@ class CmsController extends ToolAbstract
 			if (is_array($laTable))
 			{
 			    $lsField = "";
-			    $lsData = "";
 			    
 			    foreach ($laTable as $laField)
 			    {
@@ -944,14 +943,10 @@ class CmsController extends ToolAbstract
 			        if ($lsF != 'id' && $lsF != 'User_id' && $lsF != 'dtInsert' && $lsF != 'dtUpdate' && $lsF != 'numStatus' && $lsF != 'isActive')
 			        {
     			        $lsDefault = "";
+    			        $lsDefaultType = 'string';
     			        $lsPri = "";
     			        $lsAuto = "";
     			        $lsNull = '* @ORM\Column(nullable=true)';
-    			        
-    			    	if ($laField['Default'] == '0' || !empty($laField['Default']))
-    			        {
-    			            $lsDefault = " = {$laField['Default']}";
-    			        }
     			        
     			        if ($laField['Key'] == 'PRI')
     			        {
@@ -979,6 +974,7 @@ class CmsController extends ToolAbstract
     			            case 'mediumint':
     			            case 'bigint':
     			                 $lsFieldType = '* @ORM\Column(type="integer")';
+    			                 $lsDefaultType = 'int';
     			                 break;
     			            case 'text':
     			            case 'tinytext':
@@ -1001,6 +997,7 @@ class CmsController extends ToolAbstract
     			            case 'double':
     			            case 'real':
     			                 $lsFieldType = '* @ORM\Column(type="decimal")';
+    			                 $lsDefaultType = 'decimal';
     			                 break;
     			            case 'boolean':
     			                 $lsFieldType = '* @ORM\Column(type="boolean")';
@@ -1009,10 +1006,19 @@ class CmsController extends ToolAbstract
     			                 $lsFieldType = '* @ORM\Column(type="string")';
     			        }	
     			        
-    			        $lsField .= "\t/**\n{$lsPri}{$lsAuto}\t{$lsFieldType}\n\t{$lsNull}\n\t*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
-    	
+			            if ($laField['Default'] == '0' || !empty($laField['Default']))
+    			        {   
+    			            if ($lsDefaultType == 'string')
+    			            {
+    			                $lsDefault = " = '{$laField['Default']}'";
+    			            }
+    			            else
+    			            {
+    			                $lsDefault = " = {$laField['Default']}";
+    			            }
+    			        }    			        
     			        
-    			        $lsData .= "\t\t\$laData['{$laField['Field']}'] = \$this->{$laField['Field']};\n";
+    			        $lsField .= "\t/**\n{$lsPri}{$lsAuto}\t{$lsFieldType}\n\t{$lsNull}\n\t*/\n\tprotected \${$laField['Field']}{$lsDefault};\n\n";
 			        }
 			    }
 			    
@@ -1030,7 +1036,6 @@ class CmsController extends ToolAbstract
                 }
                 
 		        Util::parse($lsFileContent, "#%FIELDS%#", $lsField);
-		        Util::parse($lsFileContent, "#%DATA%#", $lsData);
 		        System::saveFile($lsPathEntity, $lsFileContent);
 			}
 			else 

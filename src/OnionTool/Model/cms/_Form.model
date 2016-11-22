@@ -32,8 +32,8 @@ class #%MODULE%#Form extends Form
 		
 		$this->_aFieldSet = array(
             'CompanyData' => array(
-                'label' => 'Dados do Cliente',
-                'icon' => 'glyphicon glyphicon-user',
+                'label' => '#%MODULE%#',
+                'icon' => 'glyphicon glyphicon-cog',
                 'class' => '',
                 'fields' => array(
                     'security',
